@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "log": "jsr:@std/log@^0.224.14",
+    "seyfert": "npm:seyfert@^3.2.6"
+  }
+}

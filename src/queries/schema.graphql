@@ -1,0 +1,3170 @@
+"""
+Indicates exactly one field must be supplied and this field must not be `null`.
+"""
+directive @oneOf on INPUT_OBJECT
+
+scalar JSONObject
+
+"""DateTime custom scalar type"""
+scalar DateTime
+
+type Subscription {
+  noEmptyTypes: Boolean
+  heroesCommand(partyShortId: String): JSONObject!
+  memory(shortId: String): Adventure!
+  adventureUpdated(publicId: String): Adventure!
+  comments(contentType: String, publicId: String): Comment!
+  aiModerationProgress(shortId: String!): AiModerationProgressUpdate!
+  aiModerationResult(shortId: String!, key: String!): AiModerationResultPayload!
+  accessibleFeatures: [String!]!
+  activePremium: Premium!
+  simpleNotificationAdded: OnlineNotification!
+  messageAdded(targetType: String, publicId: String): Message!
+  messageUpdated(targetType: String, publicId: String): Message!
+  players(shortId: String): [Player!]!
+  scenarioScripting(shortId: String): Scenario!
+  actions(shortId: String): [Action!]!
+  modelContext(shortId: String): String!
+  message(shortId: String): MessagePayload!
+  actionUpdates(shortId: String!): ActionUpdatePayload!
+  comparisonResponse(shortId: String!): ComparisonResponsePayload!
+  audioContent(shortId: String!): AudioPayload!
+  contextUpdate(shortId: String!): ContextUpdatePayload!
+  resourceUpdate(shortId: String!): ResourceUpdatePayload!
+  adventureStoryCardsUpdate(shortId: String!): AdventureStoryCardsUpdatePayload!
+  adventureMemoriesUpdate(shortId: String!): AdventureMemoriesUpdatePayload!
+  adventureStateMetadataUpdate(shortId: String!): AdventureStateMetadataUpdatePayload!
+  adventureMetadataUpdate(shortId: String!): AdventureMetadataUpdatePayload!
+  actionEvent(shortId: String): ActionEventPayload! @deprecated(reason: "Use granular subscriptions")
+  narrationEvents(sessionId: ID!): NarrationEvent!
+}
+
+type Query {
+  noEmptyTypes: Boolean
+  flagVariations(platform: String!): FlagVariationsResponse!
+  heroesWorld(worldShortId: String!): HeroesWorldConfig!
+  heroesWorldMod(worldShortId: String!): JSONObject
+  heroesWorlds(page: Int): HeroesWorldsResponse!
+  heroesWorldSearch(input: HeroesWorldSearchInput): [HeroesWorldSearchable!]
+  getAchievements: [Achievement!]!
+  heroesSaves: [JSONObject!]!
+  getHeroesWebSocketServer(roomId: String): HeroesWebSocketServerResponse!
+  subscriptionPlans(providerName: String!): [PaymentPlan!]!
+  shadowPlans: [PaymentPlan!]!
+  creditPrices(providerName: String!): [PaymentProductPrice!]!
+
+  """
+  Search for content using keyword and/or semantic search
+  Frontend calls this to display search results
+  """
+  search(input: SearchInput!): SearchResults!
+
+  """
+  Find content similar to a given content item
+  Frontend calls this for "related content" features
+  [STUB - Not yet implemented]
+  """
+  similar(contentId: ID!, contentType: String!, limit: Int): [Searchable!]!
+
+  """
+  Get personalized recommendations for a user
+  Frontend calls this for "recommended for you" features
+  [STUB - Not yet implemented]
+  """
+  recommendations(userId: ID!, limit: Int): [Searchable!]!
+  user(username: String): User!
+  sessionTransferToken: String!
+  adventure(shortId: String, viewPublished: Boolean): Adventure!
+  adventureState(shortId: String): Adventure!
+  banners(platform: String): [Banner!]!
+  carousels(platform: String): [Carousel!]!
+  avatars: [Content!]!
+  covers(search: String!): [PineconeMetadata!]!
+  uploadAllowance: UploadAllowance
+  visualGenerationFile(identifier: String!): VisualGenerationFile
+  aiVisibleVersions: AiVisibleVersionResponse!
+  getAiModerationData(input: GetAiModerationDataInput!): AiModerationDataResponse!
+  getAiModerationUsageOfUser: AiModerationUsageResponse!
+  getPublishedAiModerationData(input: GetPublishedAiModerationDataInput!): AiModerationDataResponse!
+  scenario(shortId: String, viewPublished: Boolean): Scenario!
+  scenarioPublished(shortId: String!): ScenarioPublished!
+  scenarioPublishedLatestForDraft(shortId: String!): ScenarioPublished
+
+  """Get public adventure metadata for SEO/crawlers (no auth required)"""
+  seoAdventure(shortId: String!): SEOAdventure
+
+  """Get public scenario metadata for SEO/crawlers (no auth required)"""
+  seoScenario(shortId: String!): SEOScenario
+
+  """Get public visual file metadata for SEO/crawlers (no auth required)"""
+  seoVisualFile(identifier: String!): SEOVisualFile
+  notifications(type: String!, limit: Int, offset: Int): [OnlineNotification!]!
+  versionSettings(versionName: String!, versionType: String!): JSONObject!
+  recentMemories(shortId: String): [JSONObject]
+  comments(contentType: String, publicId: String): Commentable!
+  searchNoCache(input: SearchInput): [Searchable!]
+  searchMinuteCache(input: SearchInput): [Searchable!]
+  searchHourCache(input: SearchInput): [Searchable!]
+  searchDayCache(input: SearchInput): [Searchable!]
+  recentlyPlayed(interval: String, limit: Int): [Searchable!]!
+  themes: [Theme!]!
+}
+
+type Mutation {
+  noEmptyTypes: Boolean
+  sendUserEvent(input: EventInput): SendUserEventResponse!
+  sendSystemEvent(input: EventInput): SendSystemEventResponse!
+  sendExperimentEvent(input: EventInput): SendExperimentEventResponse!
+  sendEvent(input: EventStreamInput): SendEventResponse!
+  submitActionFeedback(input: SubmitActionFeedbackInput!): SubmitActionFeedbackResponse!
+  heroesSubmitFeedback(newGameState: JSONObject!, feedback: JSONObject!, oldGameState: JSONObject): HeroesSubmitFeedbackResponse
+  heroesRunAITask(params: JSONObject!): HeroesRunAITaskResponse
+  heroesCheckAchievements(character: String!, text: String!): HeroesCheckAchievementResponse
+  heroesSaveGame(gameState: JSONObject!, slotNumber: Int!): HeroesSaveGameResponse
+  heroesLoadGame(params: JSONObject!): HeroesLoadGameResponse
+  heroesLoadFeedback(uuid: String!, loadType: String!): HeroesLoadFeedbackResponse!
+  heroesDeleteGame(slotNumber: Int!): HeroesDeleteGameResponse
+  heroesCommand(partyShortId: String, command: JSONObject!): HeroesCommandResponse
+  heroesCreateWorld(input: HeroesWorldInput): HeroesWorldConfigResponse!
+  heroesUpdateWorld(input: HeroesWorldInput!): HeroesWorldConfigResponse!
+  heroesDeleteWorld(input: HeroesWorldInput!): HeroesWorldConfigResponse!
+  heroesPublishWorld(shortId: String!, published: Boolean!): HeroesWorldConfigResponse!
+  heroesUploadWorldImage(shortId: String!, imageUrl: String!): HeroesWorldConfigResponse!
+  updateUser(input: UserInput): UpdateUserResponse!
+  addDeviceToken(token: String, platform: String): AddDeviceTokenResponse!
+  verifyEmail(targetUserId: String!): VerifyEmailResponse!
+  optIn(userPublicId: String!): OptInResponse!
+  optOut(userPublicId: String!, userEmail: String): OptOutResponse!
+  verifyAndChangeEmail(email: String!, previousEmail: String!): VerifyEmailResponse!
+  deleteAccount: DeleteAccountResponse!
+  serverSnapshot: MutationResponse!
+  invalidateCache(type: String, schemaCoordinate: String): CacheInvalidationResponse!
+  playAdventure(scenarioShortId: String, prompt: String, memory: String, authorsNote: String, storyCards: [UpdateStoryCardInput!], imageUrl: String, viewPublished: Boolean): PlayAdventureResponse!
+  duplicateAdventure(shortId: String): DuplicateAdventureResponse!
+  joinMultiplayerAdventure(shortCode: String!): JoinMultiplayerAdventureResponse!
+  leaveMultiplayerAdventure(shortId: String): LeaveMultiplayerAdventureResponse!
+  updateAdventureDetails(input: AdventureDetailsInput): UpdateAdventureDetailsResponse!
+  updateAdventurePlot(input: AdventurePlotInput): UpdateAdventurePlotResponse!
+  updateAdventureState(input: AdventureStateInput): UpdateAdventureStateResponse!
+  updateAdventureImage(shortId: String!, image: String!): UpdateAdventureImageResponse!
+  updateAdventureUpload(shortId: String!, uploadId: String!): UpdateAdventureImageResponse!
+  adventureVisibility(shortId: String!, visibility: String!): AdventureVisibilityResponse!
+  createComment(input: CommentInput): CreateCommentResponse!
+  deleteComment(id: String!): DeleteCommentResponse!
+  updateComment(input: CommentInput): UpdateCommentResponse!
+  submitFeedback(input: SubmitFeedbackInput!): SubmitFeedbackResponse!
+  reportContent(input: ReportContentInput): ReportContentResponse!
+  selfReportContent(input: SelfReportContentInput): SelfReportContentResponse!
+  moderateContent(input: ModerateContentInput!): ModerateContentResponse!
+  aiModerateScenario(input: AiModerateScenarioInput!): AiModerateScenarioResponse!
+  saveContent(input: ContentResponseInput!): SaveContentResponse! @deprecated(reason: "Use saveContentResponses instead")
+  voteContent(input: ContentResponseInput!): VoteContentResponse! @deprecated(reason: "Use saveContentResponses instead")
+  setContentPreference(input: ContentPreferenceInput!): SetContentPreferenceResponse! @deprecated(reason: "Use saveContentResponses instead")
+  removeContentPreference(input: ContentPreferenceRemoveInput!): SetContentPreferenceResponse! @deprecated(reason: "Use saveContentResponses instead")
+  saveContentResponses(input: SaveContentResponsesInput!): SaveContentResponsesResponse!
+  createScenario(input: ScenarioInput): CreateScenarioResponse!
+  createScenarioOptions(title: String, shortId: String, count: Int): CreateScenarioOptionsResponse!
+  duplicateScenario(shortId: String): DuplicateScenarioResponse!
+  updateScenario(input: ScenarioInput): UpdateScenarioResponse!
+  updateScenarioImage(shortId: String, image: String): UpdateScenarioImageResponse!
+  updateScenarioUpload(shortId: String, uploadId: String): UpdateScenarioImageResponse!
+  scenarioVisibility(shortId: String!, visibility: String!): ScenarioVisibilityResponse!
+  characterCreationPlay(input: CharacterCreationInput): CharacterCreationResponse!
+  publishScenario(shortId: String!): PublishScenarioResponse!
+  deleteScenarioPublished(shortId: String!): DeleteScenarioPublishedResponse!
+  destroyScenarioPublished(shortId: String!): DeleteScenarioPublishedResponse!
+  restoreScenarioPublished(shortId: String!): DeleteScenarioPublishedResponse!
+  importStoryCards(input: ImportStoryCardsInput!): ImportStoryCardsResponse
+  createStoryCard(input: CreateStoryCardInput!): CreateStoryCardResponse
+  generateStoryCard(input: GenerateStoryCardInput!): GenerateStoryCardResponse
+  updateStoryCard(input: UpdateStoryCardInput!): UpdateStoryCardResponse
+  deleteStoryCard(input: DeleteStoryCardInput!): DeleteStoryCardResponse
+  deleteAdventure(shortId: String): DeleteAdventureResponse!
+  destroyAdventure(shortId: String): DestroyAdventureResponse!
+  restoreAdventure(shortId: String): RestoreAdventureResponse!
+  deleteScenario(shortId: String): DeleteScenarioResponse!
+  destroyScenario(shortId: String): DestroyScenarioResponse!
+  restoreScenario(shortId: String): RestoreScenarioResponse!
+  emptyTrash: EmptyTrashResponse!
+  sendHeroesEvent(input: HeroesEventInput!): SendHeroesEventResponse!
+  generateChurnkey: ChurnkeyResponse!
+  tradeResources(input: TradeResourcesInput!): TradeResourcesResponse!
+  stripeSubscriptionPortal(returnUrl: String!): StripePortalResponse!
+  stripeCheckout(priceId: String!, successUrl: String!, cancelUrl: String!, amount: Int): StripePortalResponse!
+  scalesTip(toUserId: String, quantity: Int, reason: String, reasonId: String): ScaleToTipResponse!
+  notificationsSeen(ids: [ID!]!): NotificationsSeenResponse!
+  notificationPressed(id: ID!): NotificationsPressedResponse!
+  updateProfile(input: ProfileInput): UpdateProfileResponse!
+  updateAvatar(shortId: String, thumbImageUrl: String): UpdateAvatarResponse!
+  getReward: GetRewardResponse!
+  saveSettings(settings: JSONObject!, adventureShortId: String): SaveSettingsResponse!
+  saveVersionSettings(settings: JSONObject!, adventureShortId: String): SaveVersionSettingsResponse!
+  blockUser(targetUserId: String): BlockUserResponse!
+  followUser(targetUserId: String): FollowUserResponse!
+  unblockUser(targetUserId: String): UnblockUserResponse!
+  unfollowUser(targetUserId: String): UnfollowUserResponse!
+  addFriendRequest(targetUserId: String): AddFriendRequestResponse!
+  cancelFriendRequest(targetUserId: String): CancelFriendRequestResponse!
+  confirmFriendRequest(sourceUserId: String): ConfirmFriendRequestResponse!
+  unfriendUser(targetUserId: String): UnfriendUserResponse!
+  selectComparison(input: SelectComparisonInput!): AddActionResponse!
+  editMemory(input: EditMemoryInput!): EditMemoryResponse!
+  deleteMemory(input: DeleteMemoryInput!): DeleteMemoryResponse!
+  updatePlayer(input: PlayerInput): UpdatePlayerResponse!
+  removePlayer(shortId: String, playerId: String, block: Boolean): RemovePlayerResponse!
+  markAsTyping(shortId: String): MarkAsTypingResponse!
+  testCustomFunction(customFunction: String, sharedLibrary: String, input: JSONObject): TestCustomFunctionResponse
+  updateScenarioScripts(shortId: String, gameCode: JSONObject): UpdateScenarioScriptsResponse!
+  purchaseBoost(boostName: String!): PurchaseBoostResponse!
+  startNarration(input: StartNarrationInput!): StartNarrationPayload!
+  addAction(input: ActionInput!): AddActionResponse!
+  retryAction(input: AlterInput): RetryActionResponse!
+  actionRequest(input: ActionRequestInput!): ActionRequestResponse!
+  cancelActionRequest(input: CancelActionRequestInput!): CancelActionRequestResponse!
+  checkActionRequest(input: CheckActionRequestInput!): CheckActionRequestResponse!
+  getImage(input: GetImageInput): GetImageResponse!
+  updateActions(input: UpdateActionsInput!): UpdateActionsResponse!
+}
+
+interface MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type FlagVariation {
+  id: ID!
+  flagName: String!
+  variationName: String
+  version: Int!
+  isExperiment: Boolean
+  variationId: String
+}
+
+type FlagVariationsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  flagVariations: [FlagVariation!]!
+}
+
+type SendUserEventResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type SendSystemEventResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type SendExperimentEventResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type SendEventResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+input EventInput {
+  platform: String
+  eventName: String
+  variation: String
+  value: Float
+  clientInfo: JSONObject
+}
+
+input EventStreamInput {
+  eventType: String!
+  eventName: String!
+  eventVariation: String
+  metadata: JSONObject
+}
+
+type SubmitActionFeedbackResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+input SubmitActionFeedbackInput {
+  feedbackType: String!
+  comments: String
+  metadata: JSONObject
+}
+
+type HeroesCommandResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesSaveGameResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesDeleteGameResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesLogStatesResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesWorldSearchable {
+  id: ID!
+  shortId: String!
+  userId: String!
+  title: String
+  description: String
+  image: String
+  heroesVersion: Int!
+  published: Boolean!
+  publishedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  user: User!
+  isOwner: Boolean!
+}
+
+input HeroesWorldSearchInput {
+  searchTerm: String
+  limit: Int = 20
+  offset: Int = 0
+  published: Boolean = true
+  sortOrder: String = "updated"
+}
+
+type HeroesLoadGameResponse implements MutationResponse {
+  savedGame: JSONObject
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesCheckAchievementResponse implements MutationResponse {
+  completedAchievements: JSONObject!
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesRunAITaskResponse implements MutationResponse {
+  result: String
+  embeddings: [Float!]
+  images: [String!]
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesSubmitFeedbackResponse implements MutationResponse {
+  oldGameState: JSONObject!
+  newGameState: JSONObject!
+  feedback: JSONObject!
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesWorldConfigResponse implements MutationResponse {
+  heroesWorld: HeroesWorldConfig
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesWorldConfig {
+  id: String!
+  shortId: String!
+  title: String!
+  description: String
+  image: String
+  userId: String!
+  worldConfig: JSONObject!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  heroesVersion: Int!
+  worldMod: JSONObject
+  mods: JSONObject
+  published: Boolean
+  publishedAt: DateTime
+}
+
+type Achievement {
+  id: String!
+  name: String!
+  description: String!
+  count: Int!
+}
+
+input HeroesWorldInput {
+  shortId: String!
+  title: String!
+  description: String
+  image: String
+  worldConfig: JSONObject!
+  worldMod: JSONObject
+  mods: JSONObject
+}
+
+type HeroesFeedback {
+  id: String!
+  rating: String!
+  systemType: String!
+  failureType: String
+  reason: String!
+  shortId: String!
+  createdAt: DateTime!
+}
+
+type HeroesLoadFeedbackResponse implements MutationResponse {
+  gameState: JSONObject
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesWorldsResponse {
+  worlds: [HeroesWorldConfig!]!
+  totalCount: Int!
+}
+
+type HeroesWebSocketServerResponse implements MutationResponse {
+  server: HeroesWebSocketServer
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type HeroesWebSocketServer {
+  url: String!
+  host: String!
+  roomCount: Int!
+}
+
+type PaymentPlan {
+  id: ID!
+  name: String!
+  planDetails: JSONObject!
+  planSettings: JSONObject!
+  prices: [PaymentPlanPrice!]!
+  engines: [PaymentPlanEngine!]!
+}
+
+type PaymentPlanEngine {
+  taskName: String!
+  aiDetails: JSONObject!
+  versionDetails: JSONObject
+  engineDetails: JSONObject
+}
+
+type PaymentPlanPrice {
+  id: ID!
+  planName: String!
+  periodMonths: Int!
+  pricePerUnit: Float!
+  pricePerMonth: Float!
+  awardVisualCredits: Int!
+  awardCredits: Int!
+  providerProductName: String!
+  priceId: String!
+  duration: String!
+  savings: String!
+  period: String!
+  renewing: Boolean
+  isValidForTrial: Boolean
+}
+
+type PaymentProductPrice {
+  id: ID!
+  planName: String!
+  periodMonths: Int!
+  pricePerUnit: Float!
+  pricePerMonth: Float!
+  awardVisualCredits: Int!
+  awardCredits: Int!
+  providerProductName: String!
+  providerPriceKey: String!
+}
+
+input SearchInput {
+  """The type of content to search (world, scenario, adventure, etc.)"""
+  contentType: String!
+
+  """Optional search term for keyword/semantic search"""
+  searchTerm: String
+
+  """Filter by tags (must have ALL these tags)"""
+  tags: [String!]
+
+  """Filter by content rating"""
+  contentRating: String
+
+  """Sort order: trending, newest, popular, or relevance (default)"""
+  sortOrder: String
+
+  """Maximum number of results to return (default: 10)"""
+  limit: Int
+
+  """Pagination offset (default: 0)"""
+  offset: Int
+  savedOnly: Boolean
+  deletedOnly: Boolean
+  followingUsernames: [String!]
+  following: Boolean
+  parentContentId: String
+  published: Boolean
+  safe: Boolean
+  contentRatingFilters: [String!]
+  screen: String
+  notTags: [String!]
+  curationTags: [String!]
+  notCurationTags: [String!]
+  minTotalPlays: Int
+  minTotalComments: Int
+  minTotalSaves: Int
+  minTotalVotes: Int
+  usesScripts: Boolean
+  thirdPerson: Boolean
+  timeRange: String
+  username: String
+  isCurrentUser: Boolean
+  creators: String
+  type: String
+  carouselId: String
+  alpha: Float
+}
+
+"""
+Base interface for content documents (matches ContentDocument from @aidungeon/search)
+This is the unified interface for search results from OpenSearch
+"""
+interface ContentDocument {
+  contentType: String!
+  contentId: String!
+  userId: String!
+  title: String
+  description: String
+  image: String
+  tags: [String!]
+  contentRating: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  s3_url: String
+  content_page_url: String
+  shortId: String
+  heroesVersion: Int
+  thirdPerson: Boolean
+  usesScripts: Boolean
+  scenarioType: String
+  metrics: ContentMetrics
+  contentEmbedding: [Float!]
+  embeddingGeneratedAt: DateTime
+  searchText: String
+}
+
+"""Concrete implementation of ContentDocument for search results"""
+type SearchableContent implements ContentDocument {
+  contentType: String!
+  contentId: String!
+  userId: String!
+  title: String
+  description: String
+  image: String
+  tags: [String!]
+  contentRating: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  s3_url: String
+  content_page_url: String
+  shortId: String
+  heroesVersion: Int
+  thirdPerson: Boolean
+  usesScripts: Boolean
+  scenarioType: String
+  metrics: ContentMetrics
+  contentEmbedding: [Float!]
+  embeddingGeneratedAt: DateTime
+  searchText: String
+}
+
+"""Engagement and quality metrics for content"""
+type ContentMetrics {
+  adventureCount: Int
+  saveCount: Int
+  upVoteCount: Int
+  downVoteCount: Int
+  commentCount: Int
+  trendingScore: Float
+  qualityScore: Float
+  engagementScore: Float
+  metricsUpdatedAt: DateTime
+}
+
+type SearchResults {
+  """Array of search results (returned directly from OpenSearch)"""
+  items: [SearchableContent!]!
+
+  """Total number of results found"""
+  total: Int!
+
+  """Whether more results are available for pagination"""
+  hasMore: Boolean!
+
+  """Query execution time in milliseconds"""
+  took: Int
+}
+
+type UpdateUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type AddDeviceTokenResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type VerifyEmailResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type OptInResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  email: String
+}
+
+type OptOutResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  email: String
+}
+
+type DeleteAccountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+}
+
+type User {
+  id: ID!
+  email: String
+  username: String
+  firebaseUid: String
+  createdAt: DateTime
+  groups: [String!]!
+  sawUpdatesAt: DateTime
+  privateId: String!
+  lastOnlineAt: DateTime
+  accessibleFeatures: [String!]!
+  isDeveloper: Boolean!
+  isCurator: Boolean!
+  isInternal: Boolean!
+  isAlpha: Boolean!
+  hasHeroes: Boolean!
+  shouldPromptReview: Boolean!
+  shouldPromptTribute: Boolean!
+  isCurrentUser: Boolean!
+  isMember: Boolean!
+  isNewUser: Boolean!
+  isFirstAdventure: Boolean!
+  isEligibleForRewards: Boolean!
+  continueAdventure: Adventure
+  creatorAnalytics(timeRange: TimeRange!): CreatorAnalytics!
+  scenarioAnalytics(timeRange: TimeRange!, scenarioOffset: Int = 0): [ScenarioPerformance!]!
+  activePremium: Premium
+  resources: Resources!
+  creditsBalance: ResourceBalance! @deprecated(reason: "Use resources field")
+  scalesBalance: ResourceBalance! @deprecated(reason: "Use resources field")
+  promoActionsBalance: ResourceBalance! @deprecated(reason: "Use resources field")
+  profile: Profile!
+  rewardCalendar: RewardCalendar
+  settings: JSONObject!
+  defaultSettings: JSONObject!
+  friends(limit: Int, offset: Int): [Profile!]!
+  followers(limit: Int, offset: Int): [Profile!]!
+  following(limit: Int, offset: Int): [Profile!]!
+  followingUsernames: [String!]!
+  blockedUsernames: [String!]!
+  dislikedContentIds: [DislikedContent!]!
+  followersCount: Int!
+  followingCount: Int!
+  friendCount: Int!
+  isFollowedByCurrentUser: Boolean!
+  isFriendedCurrentUser: Boolean!
+  isFriendedByCurrentUser: Boolean!
+  isBlockedByCurrentUser: Boolean!
+  activeBoosts: [Boost!]!
+}
+
+input UserInput {
+  reviewedAt: DateTime
+  promptedToReviewAt: DateTime
+}
+
+type CacheInvalidationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type PlayAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+  actionResponse: ActionResponse
+}
+
+type DuplicateAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type JoinMultiplayerAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type LeaveMultiplayerAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type UpdateAdventureDetailsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type UpdateAdventurePlotResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type UpdateAdventureStateResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type UpdateAdventureImageResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type AdventureVisibilityResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type ActionConnection {
+  actions: [Action!]!
+  pageInfo: PageInfo!
+}
+
+type ActionBatchUrl {
+  batchNumber: Int!
+  url: String!
+}
+
+type ActionBatchConnection {
+  batches: [ActionBatchUrl!]!
+}
+
+type ActionBatchInfo {
+  batchNumber: Int!
+  actionCount: Int!
+}
+
+type Adventure implements Votable & Commentable & Savable & Searchable & Respondable {
+  id: ID!
+  userId: String!
+  publicId: String!
+  shortId: String!
+  playPublicId: String
+  shortCode: String
+  scenarioId: String
+  scenarioPublishedId: String
+  createdFromPublished: Boolean!
+  title: String
+  description: String
+  image: String
+  uploadId: String
+  gameState: JSONObject
+  state: AdventureState
+  message: String
+  contextInspectorData: JSONObject
+  memory: String
+  authorsNote: String
+  allowComments: Boolean!
+  thirdPerson: Boolean!
+  imageStyle: String
+  instructions: String
+  details: JSONObject @deprecated(reason: "Use state instead")
+  contentRating: String
+  nsfw: Boolean @deprecated(reason: "Use contentRatingFilters instead")
+  contentRatingFilters: [String!]
+  tags: [String!]
+  published: Boolean!
+  publishedAt: DateTime
+  unlisted: Boolean!
+  featured: Boolean @deprecated(reason: "No longer used")
+  curationTags: [String!]
+  createdAt: DateTime!
+  updatedAt: DateTime @deprecated(reason: "Use editedAt instead")
+  editedAt: DateTime
+  deletedAt: DateTime
+  publishTable: Boolean!
+  contentType: String!
+
+  """@deprecated Use contentResponses.isSaved instead"""
+  isSaved: Boolean! @deprecated(reason: "Use contentResponses.isSaved instead")
+  saveCount: Int!
+
+  """@deprecated Use contentResponses.userVote instead"""
+  userVote: String @deprecated(reason: "Use contentResponses.userVote instead")
+  voteCount: Int!
+  comments(limit: Int, offset: Int): [Comment!]!
+  commentCount: Int!
+  showComments: Boolean!
+  storyCardCount: Int!
+  blockedAt: DateTime
+  nsfwModeratorTag: Boolean @deprecated(reason: "No longer used")
+  bannedWords: [String!] @deprecated(reason: "No longer used")
+  contentRatingLockedAt: DateTime
+  contentRatingLockedMessage: String
+  actionWindow(limit: Int, offset: Int, desc: Boolean): [Action!]!
+  read(offset: Int, pageSize: Int): ActionConnection!
+  readBatches(lastBatch: Int, actionsNeeded: Int, startFromEnd: Boolean, batchNumbers: [Int!]): ActionBatchConnection!
+  actionCount: Int!
+  actionBatchInformation: [ActionBatchInfo!]!
+  user: User!
+  userJoined: Boolean!
+  isOwner: Boolean!
+  playerCount: Int!
+  scenario: Scenario
+  contentResponses: ContentResponses!
+  storyCards: [StoryCard!]!
+  allPlayers: [Player!]!
+}
+
+type AdventureState {
+  adventureId: String!
+  type: String!
+  memories: [Memory!]
+  instructions: JSONObject
+  storySummary: String
+  lastSummarizedActionId: String
+  lastMemoryActionId: String
+  storyCards: [StoryCard!]
+  storyCardInstructions: String
+  storyCardStoryInformation: String
+}
+
+input AdventureDetailsInput {
+  shortId: String!
+  title: String
+  description: String
+  image: String
+  tags: [String!]
+  nsfw: Boolean @deprecated(reason: "Use contentRatingFilters instead")
+  contentRating: String
+  allowComments: Boolean
+  instructions: String @deprecated(reason: "Use details.instructions instead")
+  details: JSONObject @deprecated(reason: "Use updateAdventureState instead")
+}
+
+input AdventurePlotInput {
+  shortId: String!
+  memory: String
+  authorsNote: String
+  bannedWords: [String!] @deprecated(reason: "No longer used")
+  thirdPerson: Boolean
+  instructions: String @deprecated(reason: "Use updateAdventureState instead")
+}
+
+input AdventureStateInput {
+  shortId: String!
+  details: JSONObject @deprecated(reason: "Use state instead")
+  state: JSONObject
+}
+
+input SummaryInput {
+  publicId: String
+  selectedSummary: JSONObject
+}
+
+enum TimeRange {
+  OneDay
+  SevenDays
+  ThirtyDays
+  NinetyDays
+  ThisQuarter
+  LastQuarter
+  All
+}
+
+type CreatorAnalytics {
+  summary: AnalyticsSummary!
+  timeSeriesData: TimeSeriesData!
+}
+
+type AnalyticsSummary {
+  publishedScenarios: Float!
+  adventuresPlayed: Float!
+  actionsPlayed: Float!
+  actionsPerAdventure: Float!
+  trends: SummaryTrends!
+}
+
+type SummaryTrends {
+  publishedScenariosTrend: Float!
+  adventuresPlayedTrend: Float!
+  actionsPlayedTrend: Float!
+  actionsPerAdventureTrend: Float!
+}
+
+type TimeSeriesData {
+  publishedScenarios: [TimePoint!]!
+  adventuresPlayed: [TimePoint!]!
+  actionsPlayed: [TimePoint!]!
+  actionsPerAdventure: [TimePoint!]!
+}
+
+type TimePoint {
+  date: DateTime!
+  value: Float!
+}
+
+type ScenarioPerformance {
+  id: ID!
+  shortId: String!
+  title: String!
+  publishedAt: DateTime
+  hasPublishedSnapshot: Boolean!
+  parentScenarioId: String
+  actions: Float!
+  adventures: Float!
+  actionsPerAdventure: Float!
+  likes: Float!
+  commentCount: Float!
+  saveCount: Float!
+  rating: String
+  tags: [String]
+}
+
+type Banner {
+  id: ID!
+  bannerName: String!
+  flagName: String!
+  variationName: String!
+  eyebrow: String!
+  title: String!
+  description: String!
+  callToAction: String!
+  iconName: String!
+  buttonIconName: String!
+  buttonUrl: String!
+  buttonUrlType: String!
+  buttonTheme: String!
+  imageUrl: String!
+  priority: Int!
+  accentColor: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
+type Carousel {
+  id: ID!
+  details: JSONObject!
+  display: JSONObject!
+  flagName: String
+  flagVariationName: String
+}
+
+type CreateCommentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  content: Commentable
+}
+
+type DeleteCommentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  comment: Comment
+}
+
+type UpdateCommentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  comment: Comment
+}
+
+type Comment implements Votable & Respondable {
+  id: ID!
+  userId: ID!
+  publicId: String!
+  publishedAt: DateTime
+  contentId: String
+  commentText: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  reviewStatus: String
+  contentType: String!
+  userVote: String @deprecated(reason: "Use contentResponses.userVote instead")
+  voteCount: Int!
+  saveCount: Int!
+  user: User!
+  contentResponses: ContentResponses!
+}
+
+input CommentInput {
+  id: String
+  contentType: String
+  publicId: String
+  commentText: String
+}
+
+input SubmitFeedbackInput {
+  feedbackType: String!
+  comments: String!
+  metadata: JSONObject
+}
+
+type SubmitFeedbackResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type UploadAllowance {
+  dailyUploadCount: Int!
+  directUploadUrl: String
+  fileId: String
+  fileUploadCooldown: Boolean
+}
+
+type Content {
+  id: ID!
+  shortId: String
+  thumbImageUrl: String
+  thumbShortId: String
+  coverImageUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PineconeData {
+  id: String
+  score: Float
+  metadata: PineconeMetadata
+}
+
+type PineconeMetadata {
+  aid: String
+  cloudflareUuid: String
+  bunnyUuid: String
+  genre: String
+}
+
+type VisualGenerationFile {
+  id: ID!
+  cloudflareUuid: String
+  bunnyUuid: String
+  s3Uuid: String
+  caption: String
+  userId: String
+}
+
+type AiVisibleVersionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  aiVisibleVersions: [AiVisibleVersion!]
+  visibleTextVersions: [AiVisibleVersion!]
+  visibleImageVersions: [AiVisibleVersion!]
+}
+
+type VisibleModelEngine {
+  engineName: String
+  engineDetails: JSONObject
+  availableSettings: [String!]
+  available: Boolean!
+}
+
+type StoryStyle {
+  styleName: String
+  styleTitle: String
+  styleDescription: String
+  styleImageUrl: String
+  styleInfoLink: String
+  available: Boolean!
+}
+
+type AiVersionSettings {
+  isPromoModel: Boolean
+  isFreeModel: Boolean
+  isSafeModel: Boolean
+  isDefaultModel: Boolean
+  isExperimentalModel: Boolean
+  temperature: JSONObject
+  textLength: JSONObject
+  topK: JSONObject
+  topP: JSONObject
+  repetitionPenalty: JSONObject
+  presencePenalty: JSONObject
+  countPenalty: JSONObject
+  frequencyPenalty: JSONObject
+  contextTokens: JSONObject
+  skipRetryLink: Boolean
+}
+
+type AiVisibleVersion {
+  id: String!
+  type: String
+  versionName: String!
+  engineNameEngine: VisibleModelEngine
+  access: String!
+  release: String!
+  instructions: String
+  aiDetails: JSONObject!
+  aiSettings: JSONObject!
+  available: Boolean!
+}
+
+type ReportContentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  reportResponses: [ReportResponse]
+}
+
+type SelfReportContentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type ModerateContentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+  adventure: Adventure
+}
+
+type AiModerationDataResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  inputText: String
+  responseText: String
+}
+
+type AiModerationUsageResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  count: Int!
+  remaining: Int!
+  limit: Int!
+}
+
+input GetAiModerationDataInput {
+  shortId: String!
+}
+
+type ReportResponse {
+  label: String!
+  count: Int!
+}
+
+input ReportContentInput {
+  contentType: String
+  contentId: String
+  contentUserId: String
+  contentPublicId: String
+  labels: [String]
+  notes: String
+  details: JSONObject
+}
+
+input SelfReportContentInput {
+  adventureShortId: String
+  notes: String
+  errorContext: JSONObject
+}
+
+input ReportUserInput {
+  username: String
+  labels: [String]
+  notes: String
+}
+
+input ModerateContentInput {
+  contentType: String!
+  shortId: String!
+  curationTags: [String]!
+  contentRating: String
+  contentRatingLockedMessage: String
+  blockedAt: String
+}
+
+input AiModerateScenarioInput {
+  shortId: String!
+  key: String
+}
+
+input GetPublishedAiModerationDataInput {
+  shortId: String!
+  version: Int!
+}
+
+type AiModerateScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  final_rating: String!
+  text_explanation: String!
+  text_thinking: String!
+  text_rating: String!
+  image_rating: String!
+  image_explanation: String!
+  image_thinking: String!
+  version: Int!
+  isProcessing: Boolean!
+}
+
+type AiModerationProgressUpdate {
+  step: AiModerationStep!
+  message: String!
+  timestamp: Float!
+}
+
+enum AiModerationStep {
+  ANALYSIS_STARTED
+  ANALYSIS_COMPLETED
+  FINAL_SCORING_STARTED
+}
+
+type AiModerationResultPayload {
+  shortId: String!
+  key: String!
+  success: Boolean!
+  message: String!
+  final_rating: String!
+  text_explanation: String!
+  text_thinking: String!
+  text_rating: String!
+  image_rating: String!
+  image_explanation: String!
+  image_thinking: String!
+  version: Int!
+  timestamp: Float!
+}
+
+type ContentResponses {
+  userVote: String!
+  isSaved: Boolean!
+  isDisliked: Boolean!
+}
+
+"""
+Modern interface for content that supports user responses (voting, saving, disliking).
+This replaces the deprecated Votable and Savable interfaces.
+"""
+interface Respondable {
+  id: ID!
+  publicId: String!
+  contentType: String!
+  contentResponses: ContentResponses!
+  voteCount: Int!
+  saveCount: Int!
+}
+
+type SaveContentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  content: Savable @deprecated(reason: "Use contentRes instead")
+  contentRes: Respondable
+}
+
+type VoteContentResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  content: Votable @deprecated(reason: "Use contentRes instead")
+  contentRes: Respondable
+}
+
+type SetContentPreferenceResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type SaveContentResponsesResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  content: Respondable
+}
+
+type Scenario implements Votable & Commentable & Savable & Searchable & Respondable {
+  contentResponses: ContentResponses!
+  id: ID!
+  userId: String!
+  publicId: String!
+  shortId: String!
+  title: String
+  description: String
+  image: String
+  uploadId: String
+  type: String!
+  prompt: String
+  memory: String
+  authorsNote: String
+  allowComments: Boolean!
+  parentScenarioId: String
+  details: JSONObject @deprecated(reason: "Use state instead")
+  state(viewPublished: Boolean): ScenarioState
+  published: Boolean!
+  publishedAt: DateTime
+  unlisted: Boolean!
+  tags: [String!]
+  featured: Boolean
+  contentRatingFilters: [String!]
+  createdAt: DateTime!
+  deletedAt: DateTime
+  updatedAt: DateTime
+  editedAt: DateTime
+  nsfw: Boolean
+  blockedAt: DateTime
+  nsfwModeratorTag: Boolean
+  bannedWords: [String!]
+  contentRating: String
+  contentRatingLockedAt: DateTime
+  contentRatingLockedMessage: String
+  moderationIsStale: Boolean
+  hasUnpublishedChanges: Boolean
+  publishedUpdatedAt: DateTime
+  curationTags: [String!]
+  publishTable: Boolean!
+  contentType: String!
+
+  """@deprecated Use contentResponses.isSaved instead"""
+  isSaved: Boolean! @deprecated(reason: "Use contentResponses.isSaved instead")
+
+  """@deprecated Use contentResponses.isDisliked instead"""
+  isDisliked: Boolean! @deprecated(reason: "Use contentResponses.isDisliked instead")
+  saveCount: Int!
+
+  """@deprecated Use contentResponses.userVote instead"""
+  userVote: String @deprecated(reason: "Use contentResponses.userVote instead")
+  voteCount: Int!
+  comments(limit: Int, offset: Int): [Comment!]!
+  commentCount: Int!
+  showComments: Boolean!
+  adventureCount: Int!
+  storyCardCount: Int!
+  gameCodeOnInput: String
+  gameCodeOnOutput: String
+  gameCodeOnModelContext: String
+  gameCodeSharedLibrary: String
+  user: User!
+  isOwner: Boolean!
+  parentScenario: Scenario
+  options(viewPublished: Boolean): [Scenario!]!
+  adventuresPlayed: Int!
+  thirdPerson: Boolean!
+  storyCards(viewPublished: Boolean): [StoryCard!]!
+  lastModelContext: String
+  recentScriptLogs: [String!]
+}
+
+input ContentResponseInput {
+  contentType: String!
+  responseType: String!
+  responseValue: String!
+  contentPublicId: String!
+}
+
+input ContentPreferenceInput {
+  contentType: String!
+  contentPublicId: String!
+  preferenceValue: String!
+}
+
+input ContentPreferenceRemoveInput {
+  contentType: String!
+  contentPublicId: String!
+}
+
+input ContentResponseUpdate {
+  responseType: String!
+  responseValue: String
+}
+
+input SaveContentResponsesInput {
+  contentType: String!
+  contentPublicId: String!
+  responses: [ContentResponseUpdate!]!
+}
+
+type CreateScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type CreateScenarioOptionsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenarios: [Scenario!]
+}
+
+type DuplicateScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type UpdateScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type UpdateScenarioImageResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type ScenarioVisibilityResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type CharacterCreationResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+  actionResponse: ActionResponse
+}
+
+type ScenarioState {
+  scenarioId: String!
+  type: String!
+  storyCards: [StoryCard!]
+  instructions: JSONObject
+  storySummary: String
+  storyCardInstructions: String
+  storyCardStoryInformation: String
+  scenarioStateVersion: Int!
+}
+
+input ScenarioInput {
+  shortId: String
+  uploadId: String
+  description: String
+  gameCode: JSONObject
+  memory: String
+  authorsNote: String
+  nsfw: Boolean
+  contentRating: String
+  prompt: String
+  tags: [String!]
+  thirdPerson: Boolean
+  title: String
+  allowComments: Boolean
+  featured: Boolean
+  bannedWords: [String!]
+  image: String
+  type: String
+  instructions: String
+  details: JSONObject
+  curationTags: [String!]
+}
+
+input CharacterCreationInput {
+  shortId: String!
+  key: String
+  imageUrl: String
+  name: String
+  gender: String!
+  choices: [String!]
+  thirdPerson: Boolean
+  viewPublished: Boolean
+}
+
+type DeleteScenarioPublishedResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenarioPublished: ScenarioPublished
+}
+
+type PublishScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenarioPublished: ScenarioPublished
+}
+
+type ScenarioPublished {
+  id: ID!
+  scenarioId: String
+  userId: String!
+  publicId: String!
+  shortId: String!
+  title: String
+  description: String
+  image: String
+  type: String
+  prompt: String
+  authorsNote: String
+  allowComments: Boolean!
+  storyCardCount: Int!
+  version: Int!
+  tags: [String!]
+  contentRating: String
+  publishedAt: DateTime
+  curationTags: [String!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  draft: Scenario
+  contentResponses: ContentResponses!
+}
+
+"""SEO metadata for adventures (no auth required, public content only)"""
+type SEOAdventure {
+  title: String!
+  description: String!
+  image: String!
+}
+
+"""SEO metadata for scenarios (no auth required, public content only)"""
+type SEOScenario {
+  title: String!
+  description: String!
+  image: String!
+}
+
+"""
+SEO metadata for visual generation files (no auth required, public content only)
+"""
+type SEOVisualFile {
+  cloudflareUuid: String
+  bunnyUuid: String
+  s3Uuid: String
+  caption: String
+}
+
+type StoryCard {
+  id: String!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  keys: String
+  value: String
+  type: String
+  title: String
+  description: String
+  useForCharacterCreation: Boolean
+  userId: String
+  factionName: String
+}
+
+input StoryCardStub {
+  keys: String!
+  value: String!
+  type: String!
+  title: String!
+  description: String!
+  useForCharacterCreation: Boolean
+}
+
+input ImportStoryCardsInput {
+  shortId: String!
+  contentType: String!
+  storyCards: [StoryCardStub!]!
+}
+
+type ImportStoryCardsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  storyCards: [StoryCard!]!
+}
+
+input CreateStoryCardInput {
+  id: String!
+  shortId: String!
+  contentType: String!
+  type: String!
+  title: String!
+  description: String!
+  keys: String!
+  value: String!
+  useForCharacterCreation: Boolean!
+  autoGenerate: Boolean!
+  useBetaGenerator: Boolean
+  instructions: String!
+  storyInformation: String!
+  temperature: Float!
+  includeStorySummary: Boolean!
+}
+
+type CreateStoryCardResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  storyCard: StoryCard
+}
+
+input GenerateStoryCardInput {
+  id: String!
+  shortId: String!
+  contentType: String!
+  type: String!
+  title: String!
+  description: String!
+  keys: String!
+  value: String!
+  useForCharacterCreation: Boolean!
+  useBetaGenerator: Boolean
+  instructions: String!
+  storyInformation: String!
+  temperature: Float!
+  includeStorySummary: Boolean!
+}
+
+type GenerateStoryCardResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  storyCard: StoryCard
+}
+
+input UpdateStoryCardInput {
+  id: String!
+  shortId: String!
+  contentType: String!
+  type: String!
+  title: String!
+  description: String!
+  keys: String!
+  value: String!
+  useForCharacterCreation: Boolean!
+}
+
+type UpdateStoryCardResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  storyCard: StoryCard
+}
+
+input DeleteStoryCardInput {
+  id: String!
+  shortId: String!
+  contentType: String!
+}
+
+type DeleteStoryCardResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  storyCard: StoryCard
+}
+
+type DeleteAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type DestroyAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type RestoreAdventureResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventure: Adventure
+}
+
+type DeleteScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type DestroyScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type RestoreScenarioResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type EmptyTrashResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  adventureIds: [String!]
+  scenarioIds: [String!]
+}
+
+input HeroesEventInput {
+  eventName: String!
+  eventVariation: String
+  metadata: JSONObject
+}
+
+type SendHeroesEventResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type ChurnkeyResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  hash: String
+  stripeCustomerId: String
+}
+
+type Premium {
+  userId: ID!
+  name: String!
+  title: String!
+  status: String!
+  platform: String!
+  gem: String
+  color: String
+  activeUntil: DateTime
+  accessUntil: DateTime
+  subscriptionId: ID
+  planDetails: JSONObject
+  planSettings: JSONObject
+}
+
+input SubscribeStripeInput {
+  token: String
+  coupon: String
+}
+
+input SubscribePayPalInput {
+  subscription: String
+}
+
+input UpdateStripeDefault {
+  ccToken: String
+}
+
+input CurrencyPurchaseInput {
+  chargeId: String
+  source: String
+  amount: Int
+  currencyPackageId: String
+  captureId: String
+}
+
+type Product {
+  id: ID!
+  name: String!
+  type: String!
+  cost: Int!
+  fileName: String
+}
+
+type Resources {
+  creditsBalance: ResourceBalance!
+  scalesBalance: ResourceBalance!
+  promoActionsBalance: ResourceBalance!
+}
+
+type ResourceBalance {
+  id: ID!
+  currentBalance: String!
+}
+
+type Resource {
+  id: Int!
+  currentBalance: Int!
+}
+
+input TradeResourcesInput {
+  fromResource: String!
+  toResource: String!
+  quantity: Int!
+}
+
+type TradeResourcesResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  creditsBalance: ResourceBalance!
+  scalesBalance: ResourceBalance!
+}
+
+type StripePortalResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  redirectUrl: String
+  indirectUrl: String
+}
+
+type ScaleToTipResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type Transfer {
+  id: ID!
+  fromUserId: String!
+  toUserId: String!
+  quantity: Int!
+  createdAt: DateTime!
+  sourceTransferId: String
+  reason: String
+  fromUser: User
+  toUser: User
+  product: Product
+}
+
+type NotificationsSeenResponse implements MutationResponse {
+  notifications: [OnlineNotification!]
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type NotificationsPressedResponse implements MutationResponse {
+  notification: OnlineNotification
+
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type OnlineNotification {
+  id: ID!
+  type: String!
+  details: JSONObject
+  createdAt: DateTime!
+  seenAt: DateTime
+  pressedAt: DateTime
+  fromUserId: String
+  fromUser: User
+}
+
+type Notification {
+  id: ID!
+  title: String!
+  body: String!
+  screen: String!
+  params: JSONObject
+  createdAt: DateTime!
+  fromUserId: String
+  fromUser: User
+}
+
+type UpdateProfileResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type UpdateAvatarResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  profile: Profile
+}
+
+type Profile {
+  id: ID!
+  shortId: String!
+  title: String
+  description: String
+  thumbImageUrl: String
+}
+
+input ProfileInput {
+  bio: String
+  username: String
+}
+
+type RewardCalendar {
+  id: ID!
+  title: String!
+  rewardAvailable: Boolean!
+  lastClaimedIndex: Int
+  rewards: [Reward!]!
+}
+
+type Reward {
+  id: ID!
+  quantity: String!
+  index: Int!
+  productId: String
+  product: Product
+}
+
+type GetRewardResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  reward: Reward
+  user: User
+}
+
+type SaveSettingsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type SaveVersionSettingsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  versionSettings: JSONObject
+}
+
+type BlockUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  targetUser: User
+}
+
+type BlockContentsUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  targetUser: User
+}
+
+type FollowUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  targetUser: User
+  currentUser: User
+}
+
+type UnblockUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  targetUser: User
+}
+
+type UnfollowUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  targetUser: User
+  currentUser: User
+}
+
+type AddFriendRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type CancelFriendRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type ConfirmFriendRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type UnfriendUserResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  user: User
+}
+
+type DislikedContent {
+  id: String!
+  contentType: String!
+}
+
+type Action {
+  id: ID!
+  type: String!
+  text: String!
+  userId: String
+  adventureId: String
+  decisionId: String
+  imageUrl: String
+  visualGenerationId: String
+  shareUrl: String
+  imageText: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+  undoneAt: DateTime
+  logId: String
+  fallbackAiVersion: String
+}
+
+type ComparisonResponse {
+  completionA: Comparison
+  completionB: Comparison
+  actionInput: Action
+}
+
+input SelectComparisonInput {
+  adventureShortId: String!
+  comparisons: [ComparisonInput!]!
+  actionInput: ActionStub
+  key: String
+}
+
+input ComparisonInput {
+  comparisonId: ID!
+  isPreferred: Boolean!
+}
+
+type Comparison {
+  id: ID!
+  createdAt: DateTime!
+  logId: String
+  completionText: String!
+  isPreferred: Boolean
+}
+
+type EditMemoryResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  memory: String
+}
+
+type DeleteMemoryResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+type Memory {
+  actionIds: [String!]!
+  text: String!
+  embedding: [Float!]
+  lastRelevantActionId: String!
+  score: Float
+}
+
+input EditMemoryInput {
+  adventureId: String!
+  actionId: String!
+  text: String!
+}
+
+input DeleteMemoryInput {
+  adventureId: String!
+  actionId: String!
+}
+
+type Message {
+  id: ID!
+  publicId: String!
+  messageText: String!
+  createdAt: DateTime!
+  deletedAt: DateTime
+  userId: String!
+  user: User
+}
+
+type UpdatePlayerResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  player: Player
+}
+
+type RemovePlayerResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  player: Player
+}
+
+type MarkAsTypingResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  player: Player
+}
+
+type Player {
+  id: ID!
+  userId: String!
+  characterName: String
+  createdAt: DateTime!
+  deletedAt: DateTime
+  blockedAt: DateTime
+  isTypingAt: DateTime
+  user: User
+}
+
+input PlayerInput {
+  id: ID
+  characterName: String
+}
+
+interface Commentable {
+  id: ID!
+  userId: String!
+  publicId: String!
+  title: String
+  allowComments: Boolean!
+  contentType: String!
+  comments(limit: Int, offset: Int): [Comment!]!
+  commentCount: Int!
+  showComments: Boolean!
+}
+
+"""
+@deprecated This interface is deprecated. Use the Responses interface instead for new implementations.
+"""
+interface Savable {
+  id: ID!
+  publicId: String!
+  title: String
+
+  """@deprecated Use contentResponses.isSaved instead"""
+  isSaved: Boolean! @deprecated(reason: "Use contentResponses.isSaved instead")
+  saveCount: Int!
+}
+
+interface Searchable {
+  id: ID!
+  userId: String!
+  publicId: String!
+  shortId: String!
+  title: String
+  description: String
+  image: String
+  allowComments: Boolean!
+  thirdPerson: Boolean!
+  published: Boolean!
+  publishedAt: DateTime
+  unlisted: Boolean!
+  featured: Boolean
+  tags: [String!]
+  contentRating: String
+  storyCardCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  editedAt: DateTime
+  deletedAt: DateTime
+  blockedAt: DateTime
+  publishTable: Boolean!
+  contentType: String!
+
+  """@deprecated Use contentResponses.isSaved instead"""
+  isSaved: Boolean! @deprecated(reason: "Use contentResponses.isSaved instead")
+  saveCount: Int!
+
+  """@deprecated Use contentResponses.userVote instead"""
+  userVote: String @deprecated(reason: "Use contentResponses.userVote instead")
+  voteCount: Int!
+  commentCount: Int!
+  showComments: Boolean!
+  user: User!
+  isOwner: Boolean!
+}
+
+"""
+@deprecated This interface is deprecated. Use the Responses interface instead for new implementations.
+"""
+interface Votable {
+  id: ID!
+  publicId: String!
+  publishedAt: DateTime
+  contentType: String!
+
+  """@deprecated Use contentResponses.userVote instead"""
+  userVote: String @deprecated(reason: "Use contentResponses.userVote instead")
+  voteCount: Int!
+}
+
+type TestCustomFunctionResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  output: JSONObject
+}
+
+type UpdateScenarioScriptsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  scenario: Scenario
+}
+
+type Boost {
+  id: ID!
+  boostName: String!
+  endedAt: DateTime!
+}
+
+type PurchaseBoostResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  currentUser: User!
+}
+
+type MessagePayload {
+  message: String!
+  code: String
+  type: String
+  adventureShortId: String
+  errorContext: JSONObject
+}
+
+type ActionEventPayload {
+  type: String!
+  updatedActions: [Action!]!
+  adventureId: String!
+  key: String
+  audio: String
+  comparisonResponse: ComparisonResponse
+  cachedOutputs: [String]
+  time: DateTime
+  adventure: Adventure
+  versionInfo: JSONObject
+  contextSections: JSONObject
+  percentageUsed: Int
+  historyActionIds: [String]
+  historyOnly: Boolean
+  approximateAdventureTokens: Int
+  memories: JSONObject
+  memoryLimit: Int
+  numMemoriesStored: Int
+  promoActionsBalance: ResourceBalance
+  creditsBalance: ResourceBalance
+  retriedActionId: String
+}
+
+type ActionUpdatePayload {
+  type: String!
+  adventureId: String!
+  key: String
+  actions: [Action!]!
+  cachedOutputs: [String!]
+  time: DateTime
+  retriedActionId: String
+}
+
+type ComparisonResponsePayload {
+  adventureId: String!
+  key: String
+  comparisonResponse: ComparisonResponse!
+  actionInput: Action
+  time: DateTime
+}
+
+type AudioPayload {
+  adventureId: String!
+  key: String
+  audio: String!
+  actionId: String
+  time: DateTime
+}
+
+type ContextUpdatePayload {
+  adventureId: String!
+  actionId: String!
+  key: String
+  contextSections: JSONObject
+  memories: JSONObject
+  versionInfo: JSONObject
+  approximateAdventureTokens: Int
+  percentageUsed: Int
+  memoryLimit: Int
+  numMemoriesStored: Int
+  historyActionIds: [String]
+  historyOnly: Boolean
+  time: DateTime
+}
+
+type ResourceUpdatePayload {
+  adventureId: String!
+  key: String
+  creditsBalance: ResourceBalance
+  promoActionsBalance: ResourceBalance
+  time: DateTime
+}
+
+type AdventureStoryCardsUpdatePayload {
+  adventureId: String!
+  key: String
+  storyCards: [StoryCard!]
+  storyCardInstructions: String
+  storyCardStoryInformation: String
+  time: DateTime
+}
+
+type AdventureMemoriesUpdatePayload {
+  adventureId: String!
+  key: String
+  memories: [Memory!]
+  storySummary: String
+  lastSummarizedActionId: String
+  lastMemoryActionId: String
+  time: DateTime
+}
+
+type AdventureStateMetadataUpdatePayload {
+  adventureId: String!
+  key: String
+  instructions: InstructionDetails
+  adventureStateVersion: Int
+  time: DateTime
+}
+
+type AdventureMetadataUpdatePayload {
+  adventureId: String!
+  key: String
+  title: String
+  description: String
+  image: String
+  uploadId: String
+  memory: String
+  authorsNote: String
+  allowComments: Boolean
+  thirdPerson: Boolean
+  imageStyle: String
+  contentRating: String
+  tags: [String!]
+  published: Boolean
+  unlisted: Boolean
+  gameState: JSONObject
+  message: String
+  contextInspectorData: JSONObject
+  editedAt: DateTime
+  time: DateTime
+}
+
+type InstructionDetails {
+  type: String
+  scenario: String
+  custom: String
+  none: String
+}
+
+input TTSSettingOverrides {
+  speed: Float
+  style: String
+  pitch: Float
+}
+
+input StartNarrationInput {
+  sessionId: ID!
+  roomId: ID
+  messageId: ID!
+  text: String!
+  playerId: ID
+  characterName: String
+  voiceId: ID
+  modelId: String
+  settings: TTSSettingOverrides
+  turnNumber: Int
+  audience: String
+}
+
+type StartNarrationPayload {
+  narrationId: ID!
+  streamUrl: String!
+  startedAtMs: Float!
+  cachedAssetUrl: String
+}
+
+type NarrationStarted {
+  narrationId: ID!
+  sessionId: ID!
+  playerId: ID
+  messageId: ID!
+  text: String!
+  startedAtMs: Float!
+}
+
+type NarrationProgress {
+  narrationId: ID!
+  sessionId: ID!
+  playerId: ID
+  bytesStreamed: Int!
+  totalBytes: Int
+}
+
+type NarrationCompleted {
+  narrationId: ID!
+  sessionId: ID!
+  playerId: ID
+  cachedAssetUrl: String
+  durationMs: Float!
+}
+
+type NarrationError {
+  narrationId: ID!
+  sessionId: ID!
+  playerId: ID
+  error: String!
+}
+
+union NarrationEvent = NarrationStarted | NarrationProgress | NarrationCompleted | NarrationError
+
+type ActionResponse {
+  time: DateTime
+  returnedInput: String
+  actionInput: Action
+  action: Action
+  adventure: Adventure
+  audio: String
+  comparisonResponse: ComparisonResponse
+  versionInfo: JSONObject
+  contextSections: JSONObject
+  percentageUsed: Int
+  historyActionIds: [String]
+  historyOnly: Boolean
+  approximateAdventureTokens: Int
+  memories: JSONObject
+  memoryLimit: Int
+  numMemoriesStored: Int
+  promoActionsBalance: ResourceBalance
+  creditsBalance: ResourceBalance
+  cachedOutputs: [String]
+}
+
+type ActionRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  errorContext: JSONObject
+}
+
+type GetImageResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  action: Action
+}
+
+type UpdateActionsResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  actions: [Action] @deprecated(reason: "No longer used")
+  adventure: Adventure
+}
+
+input ActionRequestInput {
+  adventureId: String!
+  type: String!
+  key: String
+  text: String
+  characterName: String
+  choicesMode: Boolean
+  lengthOverride: Int
+  retryActionId: String
+  cachedOutput: String
+}
+
+input CancelActionRequestInput {
+  adventureId: String!
+  key: String!
+}
+
+type CancelActionRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+}
+
+input GetImageInput {
+  adventureId: String
+  actionId: String
+  imageText: String
+  key: String
+}
+
+input ActionStub {
+  id: String!
+  text: String!
+  imageText: String
+  imageUrl: String
+  undoneAt: DateTime
+}
+
+input UpdateActionsInput {
+  updatedAt: DateTime @deprecated(reason: "No longer used")
+  adventureId: String
+  actions: [ActionStub!]!
+  key: String
+}
+
+input ActionInput {
+  adventureId: String!
+  type: String
+  text: String
+  characterName: String
+  choicesMode: Boolean
+  lengthOverride: Int
+  skipRetryLink: Boolean
+}
+
+input AlterInput {
+  adventureId: String
+  actionId: String
+  text: String
+  skipRetryLink: Boolean
+  cachedOutput: String
+}
+
+type AddActionResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  actionResponse: ActionResponse
+  errorContext: JSONObject
+  promoActionsBalance: ResourceBalance
+}
+
+type RetryActionResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  actionResponse: ActionResponse
+  errorContext: JSONObject
+  promoActionsBalance: ResourceBalance
+}
+
+input CheckActionRequestInput {
+  adventureId: String!
+  key: String!
+}
+
+type CheckActionRequestResponse implements MutationResponse {
+  """Similar to HTTP status code, represents the status of the mutation"""
+  code: Int!
+
+  """Indicates whether the mutation was successful"""
+  success: Boolean!
+
+  """Human-readable message for the UI"""
+  message: String!
+  isProcessing: Boolean
+  processingState: String
+}
+
+type Theme {
+  id: ID!
+  spritesheetId: String!
+  title: String
+  description: String
+  themeGroup: String
+  variationTitle: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}

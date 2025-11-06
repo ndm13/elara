@@ -1,0 +1,12 @@
+{
+  "client": {
+    "userAgent": "Elara-dev",
+    "gqlEndpoint": "https://api.aidungeon.com/graphql",
+    "origin": "https://play.aidungeon.com"
+  },
+  "firebase": {
+    "identityToolkitKey": "AIzaSyCnvo_XFPmAabrDkOKBRpbivp5UH8r_3mg",
+    "clientVersion": "Firefox/JsCore/10.8.0/FirebaseCore-web",
+    "clientToken": "eyJ2ZXJzaW9uIjoyLCJoZWFydGJlYXRzIjpbeyJhZ2VudCI6ImZpcmUtY29yZS8wLjExLjQgZmlyZS1jb3JlLWVzbTIwMTcvMC4xMS40IGZpcmUtanMvIGZpcmUtYXV0aC8xLjEwLjAgZmlyZS1hdXRoLWVzbTIwMTcvMS4xMC4wIGZpcmUtanMtYWxsLWFwcC8xMS42LjAiLCJkYXRlcyI6WyIyMDI1LTA4LTA2Il19XX0"
+  }
+}

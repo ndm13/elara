@@ -1,0 +1,68 @@
+query GetScenario($shortId: String) {
+    scenario(shortId: $shortId) {
+        createdAt
+        editedAt
+        title
+        description
+        prompt
+        image
+        published
+        unlisted
+        publishedAt
+        commentCount
+        voteCount
+        saveCount
+        storyCardCount
+        tags
+        adventuresPlayed
+        thirdPerson
+        nsfw
+        contentRating
+        contentRatingLockedAt
+        user {
+            isMember
+            profile {
+                title
+                thumbImageUrl
+            }
+        }
+        ...CardSearchable
+    }
+}
+fragment CardSearchable on Searchable {
+    title
+    description
+    image
+    tags
+    voteCount
+    published
+    unlisted
+    publishedAt
+    createdAt
+    editedAt
+    deletedAt
+    blockedAt
+    saveCount
+    commentCount
+    contentRating
+    user {
+        isMember
+        profile {
+            title
+            thumbImageUrl
+        }
+    }
+    ... on Adventure {
+        actionCount
+        userJoined
+        unlisted
+        playerCount
+    }
+    ... on Scenario {
+        adventuresPlayed
+        contentResponses {
+            isSaved
+            isDisliked
+        }
+    }
+}

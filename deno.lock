@@ -1,0 +1,42 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/fmt@^1.0.5": "1.0.8",
+    "jsr:@std/fs@^1.0.11": "1.0.19",
+    "jsr:@std/io@~0.225.2": "0.225.2",
+    "jsr:@std/log@~0.224.14": "0.224.14",
+    "npm:seyfert@*": "3.2.6",
+    "npm:seyfert@3.2.6": "3.2.6",
+    "npm:seyfert@^3.2.6": "3.2.6"
+  },
+  "jsr": {
+    "@std/fmt@1.0.8": {
+      "integrity": "71e1fc498787e4434d213647a6e43e794af4fd393ef8f52062246e06f7e372b7"
+    },
+    "@std/fs@1.0.19": {
+      "integrity": "051968c2b1eae4d2ea9f79a08a3845740ef6af10356aff43d3e2ef11ed09fb06"
+    },
+    "@std/io@0.225.2": {
+      "integrity": "3c740cd4ee4c082e6cfc86458f47e2ab7cb353dc6234d5e9b1f91a2de5f4d6c7"
+    },
+    "@std/log@0.224.14": {
+      "integrity": "257f7adceee3b53bb2bc86c7242e7d1bc59729e57d4981c4a7e5b876c808f05e",
+      "dependencies": [
+        "jsr:@std/fmt",
+        "jsr:@std/fs",
+        "jsr:@std/io"
+      ]
+    }
+  },
+  "npm": {
+    "seyfert@3.2.6": {
+      "integrity": "sha512-C0mghHl2mz+Qv3U+aOyCKAH3Xc2RGipfSwffXyOs4VuKygQyUbsVOpmzBNtDtdsTNtdsE/g35PAasDfi+7cv7A=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/log@~0.224.14",
+      "npm:seyfert@^3.2.6"
+    ]
+  }
+}
