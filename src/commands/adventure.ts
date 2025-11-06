@@ -7,12 +7,14 @@ import {
 } from 'npm:seyfert';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
+import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 
 const options = {
     id: createStringOption({
         description: "The ID of the adventure",
         required: true,
-    })
+    }),
+    privacy
 };
 
 @Declare({
@@ -29,7 +31,9 @@ export default class AdventureCommand extends Command {
 
         try {
             const adventure = await ctx.api.getAdventure(ctx.options.id);
-            return await ctx.write(BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replace(/\W+/, '-')}`));
+            return await sendWithPrivacy(ctx,
+                BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replace(/\W+/, '-')}`)
+            );
         } catch (e) {
             console.error(e);
             return await ctx.write({

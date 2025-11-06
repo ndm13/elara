@@ -7,12 +7,14 @@ import {
 } from 'npm:seyfert';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
+import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 
 const options = {
     id: createStringOption({
         description: "The ID of the scenario",
         required: true,
-    })
+    }),
+    privacy
 };
 
 @Declare({
@@ -29,7 +31,9 @@ export default class ScenarioCommand extends Command {
 
         try {
             const scenario = await ctx.api.getScenario(ctx.options.id);
-            return await ctx.write(BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${scenario.title.toLowerCase().replace(/\W+/, '-')}`));
+            return await sendWithPrivacy(ctx,
+                BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${scenario.title.toLowerCase().replace(/\W+/, '-')}`)
+            );
         } catch (e) {
             console.error(e);
             return await ctx.write({

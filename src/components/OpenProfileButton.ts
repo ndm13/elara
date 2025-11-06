@@ -18,7 +18,7 @@ export default class OpenProfileButton extends ComponentCommand {
         try {
             const profile = await ctx.api.getUser(id);
             return await ctx.write({
-                flags: MessageFlags.Ephemeral,
+                flags: ctx.interaction.message.flags,
                 ...BodyBuilder.profileDetailsPayload(profile, time, `/profile/${id}`)
             });
         } catch (e) {

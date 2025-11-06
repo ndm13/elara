@@ -2,17 +2,19 @@ import {
     Command,
     Declare,
     Options,
-    createStringOption,
-    ExtendContext
+    createStringOption
 } from 'npm:seyfert';
+import {MessageFlags} from 'seyfert/lib/types/index.js';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
+import { privacy, sendWithPrivacy } from "../common/privacy.ts";
 
 const options = {
     username: createStringOption({
         description: "The name of the user's profile",
         required: true,
-    })
+    }),
+    privacy
 };
 
 @Declare({
@@ -24,12 +26,14 @@ const options = {
 @Options(options)
 export default class ProfileCommand extends Command {
 
-    async run(ctx: ExtendContext<typeof options>) {
+    async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
 
         try {
-            const profile = await ctx.api.getProfile(ctx.options.username);
-            return await ctx.write(BodyBuilder.scenarioDetailsPayload(profile, time, `/profile/${ctx.options.username}`));
+            const profile = await ctx.api.getUser(ctx.options.username);
+            return await sendWithPrivacy(ctx,
+                BodyBuilder.profileDetailsPayload(profile, time, `/profile/${ctx.options.username}`)
+            );
         } catch (e) {
             console.error(e);
             return await ctx.write({
