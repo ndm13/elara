@@ -216,7 +216,7 @@ export type GraphQLResponse<K extends string, T> = {
     }[]
 };
 
-type ContentRating = "Everyone" | "Teen" | "Mature" | "Unrated";
+export type ContentRating = "Everyone" | "Teen" | "Mature" | "Unrated";
 
 export type ScenarioData = {
     createdAt: string,

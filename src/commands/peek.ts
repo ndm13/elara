@@ -3,6 +3,7 @@ import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 import {MessageFlags} from 'seyfert/lib/types/index.js';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
+import {nsfwCheck} from "../common/nsfwCheck.ts";
 
 const options = {
     link: createStringOption({
@@ -36,17 +37,17 @@ export default class PeekCommand extends Command {
         const {type, id} = matches.groups;
         const path = url.pathname + url.search;
 
-        let payload;
+        let payload, rated;
         try {
             switch (type) {
                 case 'scenario': {
-                    const scenario = await ctx.api.getScenario(id);
-                    payload = BodyBuilder.scenarioDetailsPayload(scenario, time, path);
+                    rated = await ctx.api.getScenario(id);
+                    payload = BodyBuilder.scenarioDetailsPayload(rated, time, path);
                     break;
                 }
                 case 'adventure': {
-                    const adventure = await ctx.api.getAdventure(id);
-                    payload = BodyBuilder.adventureDetailsPayload(adventure, time, path);
+                    rated = await ctx.api.getAdventure(id);
+                    payload = BodyBuilder.adventureDetailsPayload(rated, time, path);
                     break;
                 }
                 case 'profile': {
@@ -64,7 +65,13 @@ export default class PeekCommand extends Command {
                 flags: MessageFlags.Ephemeral
             });
         }
-
+        if (nsfwCheck(ctx, rated)) {
+            return await ctx.write({
+                content: `This ${type} is ${rated.contentRating !== 'Unrated' ? 'rated ' : ''}${rated.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
+                ...payload,
+                flags: MessageFlags.Ephemeral
+            });
+        }
         return await sendWithPrivacy(ctx, payload);
     }
 }

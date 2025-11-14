@@ -1,13 +1,9 @@
-import {
-    Command,
-    Declare,
-    Options,
-    createStringOption,
-    ExtendContext
-} from 'npm:seyfert';
+import {Command, CommandContext, createStringOption, Declare, Options} from 'npm:seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
 import {privacy, sendWithPrivacy} from "../common/privacy.ts";
+import {nsfwCheck} from "../common/nsfwCheck.ts";
 
 const options = {
     id: createStringOption({
@@ -26,14 +22,20 @@ const options = {
 @Options(options)
 export default class ScenarioCommand extends Command {
 
-    async run(ctx: ExtendContext<typeof options>) {
+    async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
 
         try {
             const scenario = await ctx.api.getScenario(ctx.options.id);
-            return await sendWithPrivacy(ctx,
-                BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${scenario.title.toLowerCase().replace(/\W+/, '-')}`)
-            );
+            const payload = BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${scenario.title.toLowerCase().replaceAll(/\W+/g, '-')}`);
+            if (nsfwCheck(ctx, scenario)) {
+                return await ctx.write({
+                    content: `This scenario is ${scenario.contentRating !== 'Unrated' ? 'rated ' : ''}${scenario.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
+                    ...payload,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+            return await sendWithPrivacy(ctx, payload);
         } catch (e) {
             console.error(e);
             return await ctx.write({

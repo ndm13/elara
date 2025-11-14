@@ -8,6 +8,7 @@ import {
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
 import {privacy, sendWithPrivacy} from "../common/privacy.ts";
+import {nsfwCheck} from "../common/nsfwCheck.ts";
 
 const options = {
     id: createStringOption({
@@ -31,9 +32,15 @@ export default class AdventureCommand extends Command {
 
         try {
             const adventure = await ctx.api.getAdventure(ctx.options.id);
-            return await sendWithPrivacy(ctx,
-                BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replace(/\W+/, '-')}`)
-            );
+            let payload = BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replaceAll(/\W+/g, '-')}`);
+            if (nsfwCheck(ctx, adventure)) {
+                return await ctx.write({
+                    content: `This adventure is ${adventure.contentRating !== 'Unrated' ? 'rated ' : ''}${adventure.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
+                    ...payload,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+            return await sendWithPrivacy(ctx, payload);
         } catch (e) {
             console.error(e);
             return await ctx.write({
