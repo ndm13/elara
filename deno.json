@@ -2,5 +2,8 @@
   "imports": {
     "log": "jsr:@std/log@^0.224.14",
     "seyfert": "npm:seyfert@^3.2.6"
+  },
+  "tasks": {
+    "bot": "deno run --unstable-raw-imports --allow-env --allow-net --allow-read=./ --allow-write=./commands.json ./src/index.ts"
   }
 }
