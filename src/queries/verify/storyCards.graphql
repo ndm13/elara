@@ -1,0 +1,13 @@
+query AdventureState($shortId: String) {
+    adventureState(shortId: $shortId) {
+        storyCards {
+            value
+        }
+        user {
+            profile {
+                title
+                thumbImageUrl
+            }
+        }
+    }
+}

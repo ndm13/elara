@@ -2,6 +2,8 @@ import config from "../config.json" with {type: 'json'};
 import scenario from "../queries/scenario.graphql" with {type: 'text'};
 import adventure from "../queries/adventure.graphql" with {type: 'text'};
 import profile from "../queries/profile.graphql" with {type: 'text'};
+import verifyAdventureState from "../queries/verify/adventureState.graphql" with {type: 'text'};
+import verifyStoryCards from "../queries/verify/storyCards.graphql" with {type: 'text'};
 import log from "./logger.ts";
 
 export class AIDungeonAPI {
@@ -54,6 +56,26 @@ export class AIDungeonAPI {
         } catch (error) {
             throw AIDungeonAPIError.onRequest("Error running GraphQL query", gql, error);
         }
+    }
+
+    async getVerifyAdventureState(shortId: string): Promise<VerifyAdventureStateData> {
+        const query = {
+            operationName: "AdventureState",
+            variables: {"shortId": shortId},
+            query: verifyAdventureState
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<VerifyAdventureStateData>(query), shortId, 'adventureState')
+    }
+
+    async getVerifyStoryCards(shortId: string): Promise<VerifyStoryCardsData> {
+        const query = {
+            operationName: "AdventureState",
+            variables: {
+                "shortId": shortId
+            },
+            query: verifyStoryCards
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<VerifyStoryCardsData>(query), shortId, 'adventureState')
     }
 
     async getScenario(shortId: string): ScenarioData {
@@ -300,4 +322,22 @@ export type UserData = {
     followingCount: number,
     friendCount: number,
     followersCount: number
+};
+
+export type VerifyAdventureStateData = {
+    storyCardCount: number,
+    scenarioId: string,
+    playerCount: number
+};
+
+export type VerifyStoryCardsData = {
+    storyCards: {
+        value: string
+    }[],
+    user: {
+        profile: {
+            title: string,
+            thumbImageUrl: string
+        }
+    }
 };

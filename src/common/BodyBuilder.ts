@@ -1,8 +1,15 @@
 import {AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
 import {ActionRow, Button, Embed} from "seyfert";
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
-import {ButtonStyle} from 'seyfert/lib/types/index.js';
+import {ButtonStyle, MessageFlags} from 'seyfert/lib/types/index.js';
 import Stopwatch from "./Stopwatch.ts";
+import {
+    Container,
+    Section, Separator,
+    TextDisplay,
+    Thumbnail,
+    User
+} from "npm:seyfert@3.2.6";
 
 export default {
     scenarioDetailsPayload: (scenario: ScenarioData, time: Stopwatch, path: string): InteractionCreateBodyRequest => {
@@ -224,5 +231,30 @@ export default {
                     ])
             ]
         };
+    },
+    accountLinkedPayload: (user: User, profileStub: {title: string, thumbImageUrl: string}):InteractionCreateBodyRequest => {
+        const container = new Container().addComponents(
+            new TextDisplay().setContent("## 🔗 AI Dungeon × Discord Verified"),
+            new Separator(),
+            new Section()
+                .setComponents(
+                    new TextDisplay().setContent('## Discord'),
+                    new TextDisplay().setContent(`### <:discord:1439424878632767659> <@${user.id}>`)
+                )
+                .setAccessory(new Thumbnail().setMedia(user.avatarURL())),
+            new Section()
+                .setComponents(
+                    new TextDisplay().setContent('## AI Dungeon'),
+                    new TextDisplay().setContent(`### <:ai_dungeon:1439424456337657896> [@${profileStub.title}](https://play.aidungeon.com/profile/${profileStub.title})`)
+                )
+                .setAccessory(new Thumbnail().setMedia(profileStub.thumbImageUrl)),
+            new Separator(),
+            new TextDisplay().setContent(`I confirmed it for you: *they're the same person!* 😮`)
+        );
+        return {
+            components: [container],
+            flags: MessageFlags.IsComponentsV2
+        }
+
     }
 };

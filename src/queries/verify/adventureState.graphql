@@ -1,0 +1,7 @@
+query AdventureState($shortId: String) {
+    adventureState(shortId: $shortId) {
+        storyCardCount
+        scenarioId
+        playerCount
+    }
+}
