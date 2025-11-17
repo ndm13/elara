@@ -2,6 +2,8 @@ import config from "../config.json" with {type: 'json'};
 import scenario from "../queries/scenario.graphql" with {type: 'text'};
 import adventure from "../queries/adventure.graphql" with {type: 'text'};
 import profile from "../queries/profile.graphql" with {type: 'text'};
+import storyCardsScenario from "../queries/storyCards/scenario.graphql" with {type: 'text'};
+import storyCardsAdventure from "../queries/storyCards/adventure.graphql" with {type: 'text'};
 import verifyAdventureState from "../queries/verify/adventureState.graphql" with {type: 'text'};
 import verifyStoryCards from "../queries/verify/storyCards.graphql" with {type: 'text'};
 import log from "./logger.ts";
@@ -76,6 +78,28 @@ export class AIDungeonAPI {
             query: verifyStoryCards
         };
         return AIDungeonAPI.validateResponse(query, await this.query<VerifyStoryCardsData>(query), shortId, 'adventureState')
+    }
+
+    async getStoryCardsScenario(shortId: string): Promise<StoryCardsData> {
+        const query = {
+            operationName: "Scenario",
+            variables: {
+                "shortId": shortId
+            },
+            query: storyCardsScenario
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<StoryCardsData>(query), shortId, 'scenario')
+    }
+
+    async getStoryCardsAdventure(shortId: string): Promise<StoryCardsData> {
+        const query = {
+            operationName: "Adventure",
+            variables: {
+                "shortId": shortId
+            },
+            query: storyCardsAdventure
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<StoryCardsData>(query), shortId, 'adventure')
     }
 
     async getScenario(shortId: string): ScenarioData {
@@ -341,3 +365,14 @@ export type VerifyStoryCardsData = {
         }
     }
 };
+
+export type StoryCardsData = {
+    storyCards: {
+        keys: string,
+        title: string,
+        type: string,
+        value: string,
+        description: string,
+        useForCharacterCreation: boolean
+    }[]
+}

@@ -32,20 +32,21 @@ export default class LinkPeekCommand extends ContextMenuCommand {
         const url = new URL((matches as RegExpMatchArray)[0]);
         const path = url.pathname + url.search;
 
+        console.log('linkpeek', id)
         try {
             switch (type) {
                 case 'scenario': {
                     const scenario = await ctx.api.getScenario(id);
                     return await ctx.write({
                         flags: MessageFlags.Ephemeral,
-                        ...BodyBuilder.scenarioDetailsPayload(scenario, time, path)
+                        ...BodyBuilder.scenarioDetailsPayload(scenario, time, path, id)
                     });
                 }
                 case 'adventure': {
                     const adventure = await ctx.api.getAdventure(id);
                     return await ctx.write({
                         flags: MessageFlags.Ephemeral,
-                        ...BodyBuilder.adventureDetailsPayload(adventure, time, path)
+                        ...BodyBuilder.adventureDetailsPayload(adventure, time, path, id)
                     });
                 }
                 case 'profile': {

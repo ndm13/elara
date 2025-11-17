@@ -11,8 +11,20 @@ import {
     User
 } from "npm:seyfert@3.2.6";
 
+function getCover(image: string) {
+    const url = new URL(image);
+    // Check if the last segment is a UUID
+    const split = url.pathname.split("/");
+    const last = split[split.length - 1];
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(last.toLowerCase())) {
+        return image + '/public';
+    }
+    return image;
+}
+
 export default {
-    scenarioDetailsPayload: (scenario: ScenarioData, time: Stopwatch, path: string): InteractionCreateBodyRequest => {
+    scenarioDetailsPayload: (scenario: ScenarioData, time: Stopwatch, path: string, id: string): InteractionCreateBodyRequest => {
+        console.log('BodyBuilder', id);
         return {
             embeds: [
                 new Embed()
@@ -22,7 +34,7 @@ export default {
                         name: "A Scenario by " + scenario.user.profile.title,
                         iconUrl: scenario.user.profile.thumbImageUrl
                     })
-                    .setImage(scenario.image + '/public')
+                    .setImage(getCover(scenario.image))
                     .setColor('#FEA0FF')
                     .setFooter({
                         text: time.elaraMessage
@@ -93,12 +105,16 @@ export default {
                         new Button()
                             .setLabel(`${scenario.user.profile.title}'s Profile`)
                             .setStyle(ButtonStyle.Primary)
-                            .setCustomId('open_profile_' + scenario.user.profile.title)
+                            .setCustomId('open_profile_' + scenario.user.profile.title),
+                        new Button()
+                            .setLabel(`Get Story Cards`)
+                            .setStyle(ButtonStyle.Secondary)
+                            .setCustomId('story_cards_scenario_' + id)
                     ])
             ]
         };
     },
-    adventureDetailsPayload: (adventure: AdventureData, time: Stopwatch, path: string): InteractionCreateBodyRequest => {
+    adventureDetailsPayload: (adventure: AdventureData, time: Stopwatch, path: string, id: string): InteractionCreateBodyRequest => {
         return {
             embeds: [
                 new Embed()
@@ -108,7 +124,7 @@ export default {
                         name: "An Adventure by " + adventure.user.profile.title,
                         iconUrl: adventure.user.profile.thumbImageUrl
                     })
-                    .setImage(adventure.image + '/public')
+                    .setImage(getCover(adventure.image))
                     .setColor('#FEA0FF')
                     .setFooter({
                         text: time.elaraMessage
@@ -178,8 +194,12 @@ export default {
                             .setURL("https://alpha.aidungeon.com" + path),
                         new Button()
                             .setLabel(`${adventure.user.profile.title}'s Profile`)
+                            .setStyle(ButtonStyle.Primary)
+                            .setCustomId('open_profile_' + adventure.user.profile.title),
+                        new Button()
+                            .setLabel(`Get Story Cards`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('open_profile_' + adventure.user.profile.title)
+                            .setCustomId('story_cards_adventure_' + id)
                     ])
             ]
         };

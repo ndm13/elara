@@ -42,12 +42,12 @@ export default class PeekCommand extends Command {
             switch (type) {
                 case 'scenario': {
                     rated = await ctx.api.getScenario(id);
-                    payload = BodyBuilder.scenarioDetailsPayload(rated, time, path);
+                    payload = BodyBuilder.scenarioDetailsPayload(rated, time, path, id);
                     break;
                 }
                 case 'adventure': {
                     rated = await ctx.api.getAdventure(id);
-                    payload = BodyBuilder.adventureDetailsPayload(rated, time, path);
+                    payload = BodyBuilder.adventureDetailsPayload(rated, time, path, id);
                     break;
                 }
                 case 'profile': {

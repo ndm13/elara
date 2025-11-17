@@ -1,0 +1,12 @@
+query Scenario($shortId: String) {
+    scenario(shortId: $shortId) {
+        storyCards {
+            keys
+            title
+            type
+            value
+            description
+            useForCharacterCreation
+        }
+    }
+}
