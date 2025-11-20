@@ -1,6 +1,5 @@
 import {ModalCommand, ModalContext} from 'npm:seyfert';
 import {MessageFlags} from "seyfert/lib/types/index.js";
-import Stopwatch from "../common/Stopwatch.ts";
 import {verifyToken} from "../common/verification.ts";
 import BodyBuilder from "../common/BodyBuilder.ts";
 
@@ -10,7 +9,6 @@ export default class VerifyLinkModal extends ModalCommand {
     }
 
     async run(ctx: ModalContext) {
-        const time = new Stopwatch();
         const link = ctx.interaction.components.find(c => c.type === 1).components[0].value;
         const url = new URL(link);
 

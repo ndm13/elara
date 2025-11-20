@@ -1,0 +1,25 @@
+query Adventure($shortId: String) {
+    adventure(shortId: $shortId) {
+        title
+        read {
+            actions {
+                imageText
+                imageUrl
+                text
+                type
+                undoneAt
+                deletedAt
+                userId
+            }
+        }
+        allPlayers {
+            user {
+                id
+                profile {
+                    title
+                    thumbImageUrl
+                }
+            }
+        }
+    }
+}

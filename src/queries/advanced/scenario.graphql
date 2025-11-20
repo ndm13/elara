@@ -1,0 +1,25 @@
+query Scenario($shortId: String) {
+    scenario(shortId: $shortId) {
+        gameCodeOnInput
+        gameCodeOnModelContext
+        gameCodeOnOutput
+        gameCodeSharedLibrary
+        options {
+            shortId
+            title
+            parentScenario {
+                shortId
+            }
+        }
+        state {
+            instructions
+            storyCardInstructions
+            storyCardStoryInformation
+            storySummary
+        }
+        memory
+        prompt
+        title
+        storyCardCount
+    }
+}

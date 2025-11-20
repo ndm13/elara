@@ -1,5 +1,4 @@
 import {AttachmentBuilder, ComponentCommand, type ComponentContext} from 'npm:seyfert';
-import Stopwatch from "../common/Stopwatch.ts";
 import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
 import {Buffer} from 'node:buffer';
 
@@ -16,7 +15,6 @@ export default class StoryCardsButton extends ComponentCommand {
         try {
             switch (type) {
                 case 'scenario': {
-                    console.log('StoryCardsButton', id);
                     const cards = await ctx.api.getStoryCardsScenario(id);
                     const data = JSON.stringify(cards.storyCards, undefined, 2);
                     return await ctx.write({
@@ -27,7 +25,7 @@ export default class StoryCardsButton extends ComponentCommand {
                                 .setDescription(`Story cards for the scenario with ID ${id}`)
                                 .setFile('buffer', Buffer.from(data, 'utf8'))
                         ],
-                        flags: ctx.interaction.message.flags
+                        flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
                     });
                 }
                 case 'adventure': {
@@ -41,7 +39,7 @@ export default class StoryCardsButton extends ComponentCommand {
                                 .setDescription(`Story cards for the adventure with ID ${id}`)
                                 .setFile('buffer', Buffer.from(data, 'utf8'))
                         ],
-                        flags: ctx.interaction.message.flags
+                        flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
                     });
                 }
                 default: {

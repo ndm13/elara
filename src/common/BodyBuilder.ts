@@ -1,15 +1,8 @@
-import {AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
-import {ActionRow, Button, Embed} from "seyfert";
+import {AdvancedScenarioData, AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
+import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Thumbnail, User} from "npm:seyfert@3.2.6";
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
-import {ButtonStyle, MessageFlags} from 'seyfert/lib/types/index.js';
 import Stopwatch from "./Stopwatch.ts";
-import {
-    Container,
-    Section, Separator,
-    TextDisplay,
-    Thumbnail,
-    User
-} from "npm:seyfert@3.2.6";
+import {MessageFlags, ButtonStyle} from "npm:seyfert@3.2.6/lib/types/index.js";
 
 function getCover(image: string) {
     const url = new URL(image);
@@ -22,9 +15,14 @@ function getCover(image: string) {
     return image;
 }
 
+function largeTextMetadata(code: string) {
+    const bytes = new TextEncoder().encode(code).byteLength;
+    const lines = code.split('\n').length;
+    return `${lines} line${lines === 1 ? '' : 's'}, ${bytes < 1024 ? bytes + ` byte${bytes === 1 ? '' : 's'}` : (bytes / 1024).toFixed(2) + ' kb'}`;
+}
+
 export default {
     scenarioDetailsPayload: (scenario: ScenarioData, time: Stopwatch, path: string, id: string): InteractionCreateBodyRequest => {
-        console.log('BodyBuilder', id);
         return {
             embeds: [
                 new Embed()
@@ -107,9 +105,9 @@ export default {
                             .setStyle(ButtonStyle.Primary)
                             .setCustomId('open_profile_' + scenario.user.profile.title),
                         new Button()
-                            .setLabel(`Get Story Cards`)
+                            .setLabel(`More...`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('story_cards_scenario_' + id)
+                            .setCustomId('advanced_scenario_' + id)
                     ])
             ]
         };
@@ -197,9 +195,9 @@ export default {
                             .setStyle(ButtonStyle.Primary)
                             .setCustomId('open_profile_' + adventure.user.profile.title),
                         new Button()
-                            .setLabel(`Get Story Cards`)
+                            .setLabel(`More...`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('story_cards_adventure_' + id)
+                            .setCustomId('advanced_adventure_' + id)
                     ])
             ]
         };
@@ -276,5 +274,116 @@ export default {
             flags: MessageFlags.IsComponentsV2
         }
 
+    },
+    advancedScenarioPayload: (data: AdvancedScenarioData, id: string):InteractionCreateBodyRequest => {
+        const hasScripts = !!data.gameCodeOnInput || !!data.gameCodeOnModelContext || !! data.gameCodeOnOutput || !!data.gameCodeSharedLibrary;
+        let scriptList = '';
+        if (data.gameCodeOnInput)
+            scriptList += `\n- **Input** (${largeTextMetadata(data.gameCodeOnInput)})`;
+        if (data.gameCodeOnModelContext)
+            scriptList += `\n- **Context** (${largeTextMetadata(data.gameCodeOnModelContext)})`;
+        if (data.gameCodeOnOutput)
+            scriptList += `\n- **Output** (${largeTextMetadata(data.gameCodeOnOutput)})`;
+        if (data.gameCodeSharedLibrary)
+            scriptList += `\n- **Library** (${largeTextMetadata(data.gameCodeSharedLibrary)})`;
+        const scgenEnhancements = [];
+        if (data.state.storyCardInstructions)
+            scgenEnhancements.push('custom instructions');
+        if (data.state.storyCardStoryInformation)
+            scgenEnhancements.push('custom information');
+        const promptLines = data.prompt.split('\n').length;
+        const container = new Container().addComponents(
+            new TextDisplay().setContent(`I found more information on the scenario`),
+            new TextDisplay().setContent(`## ${data.title}`),
+            new Separator(),
+            new TextDisplay().setContent('### Story Cards'),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`This scenario has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's.'}`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`story_cards_scenario_${id}`)
+                    .setLabel('Get Story Cards')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.storyCardCount === 0)),
+            new Separator(),
+            new TextDisplay().setContent('### Scripts'),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`This scenario ${hasScripts ? 'has' : '**does not** have'} scripts.${scriptList}`),                )
+                .setAccessory(
+                    new Button()
+                        .setCustomId(`scripts_${id}`)
+                        .setLabel("Get Scripts")
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!hasScripts)),
+            new Separator(),
+            new TextDisplay().setContent('### Initial State'),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation.` : '**does not use** story card generator enhancements'}.`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`scenario_state_scgen_${id}`)
+                    .setLabel('Show Generator Details')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(scgenEnhancements.length === 0)),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`This scenario ${data.state.instructions?.type === 'scenario' ? 'has' : '**does not have**'} custom instructions.`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`scenario_state_instructions_${id}`)
+                    .setLabel('Show Custom Instructions')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.state.instructions?.type !== 'scenario')),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`This scenario ${data.memory ? 'uses' : '**does not use**'} plot essentials.`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`scenario_state_memory_${id}`)
+                    .setLabel('Show Plot Essentials')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!data.memory)),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(`The opening prompt is **${promptLines}** line${promptLines === 1 ? '' : 's'} and is **${data.prompt.length}** character${data.prompt.length === 1 ? '' : 's'} long.`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`scenario_state_prompt_${id}`)
+                    .setLabel('Show Opening Prompt')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!data.prompt))
+        );
+        return {
+            components: [container],
+            flags: MessageFlags.IsComponentsV2
+        }
+    },
+    advancedAdventurePayload: (id: string, type: string):InteractionCreateBodyRequest => {
+        const container = new Container().addComponents(
+            new TextDisplay().setContent(`## Details for ${type} \`${id}\``),
+            new Separator(),
+            new TextDisplay().setContent('### Story Cards'),
+            new Section()
+                .setComponents(
+                    new TextDisplay().setContent(`This ${type} has some number of story cards. I'm too lazy to count them.`)
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`story_cards_${type}_${id}`)
+                    .setLabel('Get Story Cards')
+                    .setStyle(ButtonStyle.Primary))
+        );
+        return {
+            components: [container],
+            flags: MessageFlags.IsComponentsV2
+        }
     }
 };

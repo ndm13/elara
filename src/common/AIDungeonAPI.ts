@@ -6,6 +6,7 @@ import storyCardsScenario from "../queries/storyCards/scenario.graphql" with {ty
 import storyCardsAdventure from "../queries/storyCards/adventure.graphql" with {type: 'text'};
 import verifyAdventureState from "../queries/verify/adventureState.graphql" with {type: 'text'};
 import verifyStoryCards from "../queries/verify/storyCards.graphql" with {type: 'text'};
+import advancedScenario from "../queries/advanced/scenario.graphql" with {type: 'text'};
 import log from "./logger.ts";
 
 export class AIDungeonAPI {
@@ -100,6 +101,17 @@ export class AIDungeonAPI {
             query: storyCardsAdventure
         };
         return AIDungeonAPI.validateResponse(query, await this.query<StoryCardsData>(query), shortId, 'adventure')
+    }
+
+    async getAdvancedScenario(shortId: string): Promise<AdvancedScenarioData> {
+        const query = {
+            operationName: "Scenario",
+            variables: {
+                "shortId": shortId
+            },
+            query: advancedScenario
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<AdvancedScenarioData>(query), shortId, 'scenario')
     }
 
     async getScenario(shortId: string): ScenarioData {
@@ -375,4 +387,28 @@ export type StoryCardsData = {
         description: string,
         useForCharacterCreation: boolean
     }[]
+}
+
+export type AdvancedScenarioData = {
+    gameCodeOnInput: string,
+    gameCodeOnModelContext: string,
+    gameCodeOnOutput: string,
+    gameCodeSharedLibrary: string,
+    options: {
+        shortId: string,
+        title: string,
+        parentScenario: {
+            shortId: string
+        }
+    },
+    state: {
+        instructions: object,
+        storyCardInstructions: string,
+        storyCardStoryInformation: string,
+        storySummary: string
+    },
+    memory: string,
+    prompt: string,
+    title: string
+    storyCardCount: number
 }

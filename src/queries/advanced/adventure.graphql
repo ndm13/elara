@@ -1,0 +1,12 @@
+query Adventure($shortId: String) {
+    adventure(shortId: $shortId) {
+        memory
+        actionCount
+        scenario {
+            title
+            shortId
+        }
+        details
+        title
+    }
+}
