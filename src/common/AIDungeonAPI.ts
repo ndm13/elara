@@ -397,10 +397,11 @@ export type AdvancedScenarioData = {
     options: {
         shortId: string,
         title: string,
+        deletedAt: string,
         parentScenario: {
             shortId: string
         }
-    },
+    }[],
     state: {
         instructions: object,
         storyCardInstructions: string,
@@ -409,6 +410,7 @@ export type AdvancedScenarioData = {
     },
     memory: string,
     prompt: string,
-    title: string
+    title: string,
+    type: string,
     storyCardCount: number
 }

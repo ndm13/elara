@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@std/collections@*": "1.1.3",
     "jsr:@std/encoding@*": "1.0.10",
     "jsr:@std/fmt@^1.0.5": "1.0.8",
     "jsr:@std/fs@^1.0.11": "1.0.19",
@@ -11,6 +12,9 @@
     "npm:seyfert@^3.2.6": "3.2.6"
   },
   "jsr": {
+    "@std/collections@1.1.3": {
+      "integrity": "bf8b0818886df6a32b64c7d3b037a425111f28278d69fd0995aeb62777c986b0"
+    },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },

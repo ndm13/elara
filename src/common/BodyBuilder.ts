@@ -3,6 +3,7 @@ import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Th
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
 import Stopwatch from "./Stopwatch.ts";
 import {MessageFlags, ButtonStyle} from "npm:seyfert@3.2.6/lib/types/index.js";
+import { chunk } from "jsr:@std/collections";
 
 function getCover(image: string) {
     const url = new URL(image);
@@ -276,92 +277,116 @@ export default {
 
     },
     advancedScenarioPayload: (data: AdvancedScenarioData, id: string):InteractionCreateBodyRequest => {
-        const hasScripts = !!data.gameCodeOnInput || !!data.gameCodeOnModelContext || !! data.gameCodeOnOutput || !!data.gameCodeSharedLibrary;
-        let scriptList = '';
-        if (data.gameCodeOnInput)
-            scriptList += `\n- **Input** (${largeTextMetadata(data.gameCodeOnInput)})`;
-        if (data.gameCodeOnModelContext)
-            scriptList += `\n- **Context** (${largeTextMetadata(data.gameCodeOnModelContext)})`;
-        if (data.gameCodeOnOutput)
-            scriptList += `\n- **Output** (${largeTextMetadata(data.gameCodeOnOutput)})`;
-        if (data.gameCodeSharedLibrary)
-            scriptList += `\n- **Library** (${largeTextMetadata(data.gameCodeSharedLibrary)})`;
-        const scgenEnhancements = [];
-        if (data.state.storyCardInstructions)
-            scgenEnhancements.push('custom instructions');
-        if (data.state.storyCardStoryInformation)
-            scgenEnhancements.push('custom information');
-        const promptLines = data.prompt.split('\n').length;
         const container = new Container().addComponents(
             new TextDisplay().setContent(`I found more information on the scenario`),
             new TextDisplay().setContent(`## ${data.title}`),
-            new Separator(),
-            new TextDisplay().setContent('### Story Cards'),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`This scenario has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's.'}`)
-                )
-                .setAccessory(new Button()
-                    .setCustomId(`story_cards_scenario_${id}`)
-                    .setLabel('Get Story Cards')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(data.storyCardCount === 0)),
-            new Separator(),
-            new TextDisplay().setContent('### Scripts'),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`This scenario ${hasScripts ? 'has' : '**does not** have'} scripts.${scriptList}`),                )
-                .setAccessory(
-                    new Button()
-                        .setCustomId(`scripts_${id}`)
-                        .setLabel("Get Scripts")
-                        .setStyle(ButtonStyle.Secondary)
-                        .setDisabled(!hasScripts)),
-            new Separator(),
-            new TextDisplay().setContent('### Initial State'),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation.` : '**does not use** story card generator enhancements'}.`)
-                )
-                .setAccessory(new Button()
-                    .setCustomId(`scenario_state_scgen_${id}`)
-                    .setLabel('Show Generator Details')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(scgenEnhancements.length === 0)),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`This scenario ${data.state.instructions?.type === 'scenario' ? 'has' : '**does not have**'} custom instructions.`)
-                )
-                .setAccessory(new Button()
-                    .setCustomId(`scenario_state_instructions_${id}`)
-                    .setLabel('Show Custom Instructions')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(data.state.instructions?.type !== 'scenario')),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`This scenario ${data.memory ? 'uses' : '**does not use**'} plot essentials.`)
-                )
-                .setAccessory(new Button()
-                    .setCustomId(`scenario_state_memory_${id}`)
-                    .setLabel('Show Plot Essentials')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(!data.memory)),
-            new Section()
-                .setComponents(
-                    new TextDisplay()
-                        .setContent(`The opening prompt is **${promptLines}** line${promptLines === 1 ? '' : 's'} and is **${data.prompt.length}** character${data.prompt.length === 1 ? '' : 's'} long.`)
-                )
-                .setAccessory(new Button()
-                    .setCustomId(`scenario_state_prompt_${id}`)
-                    .setLabel('Show Opening Prompt')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(!data.prompt))
+            new Separator()
         );
+
+        if (data.type !== 'multipleChoice') {
+            // Handle directly playable scenario
+            const hasScripts = !!data.gameCodeOnInput || !!data.gameCodeOnModelContext || !!data.gameCodeOnOutput || !!data.gameCodeSharedLibrary;
+            let scriptList = '';
+            if (data.gameCodeOnInput)
+                scriptList += `\n- **Input** (${largeTextMetadata(data.gameCodeOnInput)})`;
+            if (data.gameCodeOnModelContext)
+                scriptList += `\n- **Context** (${largeTextMetadata(data.gameCodeOnModelContext)})`;
+            if (data.gameCodeOnOutput)
+                scriptList += `\n- **Output** (${largeTextMetadata(data.gameCodeOnOutput)})`;
+            if (data.gameCodeSharedLibrary)
+                scriptList += `\n- **Library** (${largeTextMetadata(data.gameCodeSharedLibrary)})`;
+            const scgenEnhancements = [];
+            if (data.state.storyCardInstructions)
+                scgenEnhancements.push('custom instructions');
+            if (data.state.storyCardStoryInformation)
+                scgenEnhancements.push('custom information');
+            const promptLines = data.prompt.split('\n').length;
+
+            container.addComponents(
+                new TextDisplay().setContent('### Story Cards'),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This scenario has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's'}.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`story_cards_scenario_${id}`)
+                        .setLabel('Get Story Cards')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(data.storyCardCount === 0)),
+                new Separator(),
+                new TextDisplay().setContent('### Scripts'),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This scenario ${hasScripts ? 'has' : '**does not** have'} scripts.${scriptList}`),)
+                    .setAccessory(
+                        new Button()
+                            .setCustomId(`scripts_${id}`)
+                            .setLabel("Get Scripts")
+                            .setStyle(ButtonStyle.Secondary)
+                            .setDisabled(!hasScripts)),
+                new Separator(),
+                new TextDisplay().setContent('### Initial State'),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation.` : '**does not use** story card generator enhancements'}.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_scgen_${id}`)
+                        .setLabel('Show Generator Details')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(scgenEnhancements.length === 0)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This scenario ${data.state.instructions?.type === 'scenario' ? 'has' : '**does not have**'} custom instructions.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_instructions_${id}`)
+                        .setLabel('Show Custom Instructions')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(data.state.instructions?.type !== 'scenario')),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This scenario ${data.memory ? 'uses' : '**does not use**'} plot essentials.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_memory_${id}`)
+                        .setLabel('Show Plot Essentials')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.memory)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`The opening prompt is **${promptLines}** line${promptLines === 1 ? '' : 's'} and is **${data.prompt.length}** character${data.prompt.length === 1 ? '' : 's'} long.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_prompt_${id}`)
+                        .setLabel('Show Opening Prompt')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.prompt))
+            );
+        } else {
+            // Handle parent scenario
+            container.addComponents(
+                new TextDisplay()
+                    .setContent(`### Prompt\n>>> ${data.prompt}`),
+                new Separator()
+            )
+            const rows = chunk(data.options
+                .filter(option => option.parentScenario?.shortId === id)
+                .filter(option => option.deletedAt === null)
+                .map(option => new Button()
+                    .setCustomId(`advanced_scenario_${option.shortId}`)
+                    .setLabel(option.title)
+                    .setStyle(ButtonStyle.Primary)), 5);
+            for (const row of rows) {
+                container.addComponents(new ActionRow().setComponents(row));
+            }
+        }
         return {
             components: [container],
             flags: MessageFlags.IsComponentsV2

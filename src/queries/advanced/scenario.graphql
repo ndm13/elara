@@ -7,6 +7,7 @@ query Scenario($shortId: String) {
         options {
             shortId
             title
+            deletedAt
             parentScenario {
                 shortId
             }
@@ -20,6 +21,7 @@ query Scenario($shortId: String) {
         memory
         prompt
         title
+        type
         storyCardCount
     }
 }
