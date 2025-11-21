@@ -10,6 +10,9 @@ export default class StoryCardsButton extends ComponentCommand {
     }
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
+        await ctx.deferReply({
+            ephemeral: ctx.interaction.flags & MessageFlags.Ephemeral === MessageFlags.Ephemeral
+        });
         const {type, id} = /^story_cards_(?<type>[^_]+)_(?<id>.*)$/.exec(ctx.customId).groups;
 
         try {
@@ -17,7 +20,7 @@ export default class StoryCardsButton extends ComponentCommand {
                 case 'scenario': {
                     const cards = await ctx.api.getStoryCardsScenario(id);
                     const data = JSON.stringify(cards.storyCards, undefined, 2);
-                    return await ctx.write({
+                    return await ctx.editOrReply({
                         content: "Sure, here are the story cards!",
                         files: [
                             new AttachmentBuilder()
@@ -31,7 +34,7 @@ export default class StoryCardsButton extends ComponentCommand {
                 case 'adventure': {
                     const cards = await ctx.api.getStoryCardsAdventure(id);
                     const data = JSON.stringify(cards.storyCards, undefined, 2);
-                    return await ctx.write({
+                    return await ctx.editOrReply({
                         content: "Sure, here are the story cards!",
                         files: [
                             new AttachmentBuilder()
@@ -43,7 +46,7 @@ export default class StoryCardsButton extends ComponentCommand {
                     });
                 }
                 default: {
-                    return await ctx.write({
+                    return await ctx.editOrReply({
                         content: `Sorry, it looks like I got an unexpected request type (\`${type}\`).`,
                         flags: MessageFlags.Ephemeral
                     });
@@ -51,7 +54,7 @@ export default class StoryCardsButton extends ComponentCommand {
             }
         } catch (e) {
             console.error(e);
-            return await ctx.write({
+            return await ctx.editOrReply({
                 content: "Mrrgh, I *thought* I found something, but when I asked AI Dungeon for details they yelled at me! 😭",
                 flags: MessageFlags.Ephemeral
             });

@@ -1,6 +1,7 @@
 import {ComponentCommand, type ComponentContext} from 'npm:seyfert';
 import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
 import BodyBuilder from "../common/BodyBuilder.ts";
+import Stopwatch from "../common/Stopwatch.ts";
 
 export default class AdvancedButton extends ComponentCommand {
     componentType = 'Button' as const;
@@ -10,13 +11,14 @@ export default class AdvancedButton extends ComponentCommand {
     }
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
+        const time = new Stopwatch();
         const {type, id} = /^advanced_(?<type>[^_]+)_(?<id>.*)$/.exec(ctx.customId).groups;
 
         try {
             switch (type) {
                 case 'scenario': {
                     const data = await ctx.api.getAdvancedScenario(id);
-                    const {flags, ...payload} = BodyBuilder.advancedScenarioPayload(data, id);
+                    const {flags, ...payload} = BodyBuilder.advancedScenarioPayload(data, id, time);
                     return await ctx.write({
                         ...payload,
                         flags: ctx.interaction.message.flags | flags

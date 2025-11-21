@@ -16,10 +16,15 @@ function getCover(image: string) {
     return image;
 }
 
-function largeTextMetadata(code: string) {
+function gameCodeMetadata(code: string) {
     const bytes = new TextEncoder().encode(code).byteLength;
     const lines = code.split('\n').length;
     return `${lines} line${lines === 1 ? '' : 's'}, ${bytes < 1024 ? bytes + ` byte${bytes === 1 ? '' : 's'}` : (bytes / 1024).toFixed(2) + ' kb'}`;
+}
+
+function textBlockMetadata(text: string) {
+    const lines = text.split('\n').length;
+    return `**${lines}** line${lines === 1 ? '' : 's'} and **${text.length}** character${text.length === 1 ? '' : 's'} long.`;
 }
 
 export default {
@@ -34,7 +39,6 @@ export default {
                         iconUrl: scenario.user.profile.thumbImageUrl
                     })
                     .setImage(getCover(scenario.image))
-                    .setColor('#FEA0FF')
                     .setFooter({
                         text: time.elaraMessage
                     })
@@ -124,7 +128,6 @@ export default {
                         iconUrl: adventure.user.profile.thumbImageUrl
                     })
                     .setImage(getCover(adventure.image))
-                    .setColor('#FEA0FF')
                     .setFooter({
                         text: time.elaraMessage
                     })
@@ -210,7 +213,6 @@ export default {
                     .setTitle(user.profile.title)
                     .setDescription(user.profile.description)
                     .setThumbnail(user.profile.thumbImageUrl)
-                    .setColor('#FEA0FF')
                     .setFooter({
                         text: time.elaraMessage
                     })
@@ -276,7 +278,7 @@ export default {
         }
 
     },
-    advancedScenarioPayload: (data: AdvancedScenarioData, id: string):InteractionCreateBodyRequest => {
+    advancedScenarioPayload: (data: AdvancedScenarioData, id: string, time: Stopwatch):InteractionCreateBodyRequest => {
         const container = new Container().addComponents(
             new TextDisplay().setContent(`I found more information on the scenario`),
             new TextDisplay().setContent(`## ${data.title}`),
@@ -288,19 +290,23 @@ export default {
             const hasScripts = !!data.gameCodeOnInput || !!data.gameCodeOnModelContext || !!data.gameCodeOnOutput || !!data.gameCodeSharedLibrary;
             let scriptList = '';
             if (data.gameCodeOnInput)
-                scriptList += `\n- **Input** (${largeTextMetadata(data.gameCodeOnInput)})`;
+                scriptList += `\n- **Input** (${gameCodeMetadata(data.gameCodeOnInput)})`;
             if (data.gameCodeOnModelContext)
-                scriptList += `\n- **Context** (${largeTextMetadata(data.gameCodeOnModelContext)})`;
+                scriptList += `\n- **Context** (${gameCodeMetadata(data.gameCodeOnModelContext)})`;
             if (data.gameCodeOnOutput)
-                scriptList += `\n- **Output** (${largeTextMetadata(data.gameCodeOnOutput)})`;
+                scriptList += `\n- **Output** (${gameCodeMetadata(data.gameCodeOnOutput)})`;
             if (data.gameCodeSharedLibrary)
-                scriptList += `\n- **Library** (${largeTextMetadata(data.gameCodeSharedLibrary)})`;
+                scriptList += `\n- **Library** (${gameCodeMetadata(data.gameCodeSharedLibrary)})`;
             const scgenEnhancements = [];
-            if (data.state.storyCardInstructions)
+            let scgenList = "";
+            if (data.state.storyCardInstructions) {
                 scgenEnhancements.push('custom instructions');
-            if (data.state.storyCardStoryInformation)
+                scgenList += `\n- The story card instructions are ${textBlockMetadata(data.state.storyCardInstructions)}`;
+            }
+            if (data.state.storyCardStoryInformation) {
                 scgenEnhancements.push('custom information');
-            const promptLines = data.prompt.split('\n').length;
+                scgenList += `\n- The story information is ${textBlockMetadata(data.state.storyCardStoryInformation)}`;
+            }
 
             container.addComponents(
                 new TextDisplay().setContent('### Story Cards'),
@@ -331,7 +337,7 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation.` : '**does not use** story card generator enhancements'}.`)
+                            .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
                     )
                     .setAccessory(new Button()
                         .setCustomId(`scenario_state_scgen_${id}`)
@@ -341,7 +347,9 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(`This scenario ${data.state.instructions?.type === 'scenario' ? 'has' : '**does not have**'} custom instructions.`)
+                            .setContent(data.state.instructions?.type === 'scenario' ?
+                                `The custom instructions are ${textBlockMetadata(data.state.instructions.scenario)}` :
+                                'This scenario **does not have** custom instructions.')
                     )
                     .setAccessory(new Button()
                         .setCustomId(`scenario_state_instructions_${id}`)
@@ -351,7 +359,7 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(`This scenario ${data.memory ? 'uses' : '**does not use**'} plot essentials.`)
+                            .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This scenario **does not use** plot essentials.')
                     )
                     .setAccessory(new Button()
                         .setCustomId(`scenario_state_memory_${id}`)
@@ -361,7 +369,7 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(`The opening prompt is **${promptLines}** line${promptLines === 1 ? '' : 's'} and is **${data.prompt.length}** character${data.prompt.length === 1 ? '' : 's'} long.`)
+                            .setContent(`The opening prompt is ${textBlockMetadata(data.prompt)}`)
                     )
                     .setAccessory(new Button()
                         .setCustomId(`scenario_state_prompt_${id}`)
@@ -371,11 +379,13 @@ export default {
             );
         } else {
             // Handle parent scenario
-            container.addComponents(
-                new TextDisplay()
-                    .setContent(`### Prompt\n>>> ${data.prompt}`),
-                new Separator()
-            )
+            if (data.prompt)
+                container.addComponents(
+                    new TextDisplay()
+                        .setContent(`### Prompt\n>>> ${data.prompt}`),
+                    new Separator()
+                );
+
             const rows = chunk(data.options
                 .filter(option => option.parentScenario?.shortId === id)
                 .filter(option => option.deletedAt === null)
@@ -387,6 +397,13 @@ export default {
                 container.addComponents(new ActionRow().setComponents(row));
             }
         }
+
+        container.addComponents(
+            new Separator(),
+            new TextDisplay()
+                .setContent(`-# ${time.elaraMessage}`)
+        );
+
         return {
             components: [container],
             flags: MessageFlags.IsComponentsV2
