@@ -8,5 +8,9 @@ query Adventure($shortId: String) {
         }
         details
         title
+        authorsNote
+        gameState
+        message
+        storyCardCount
     }
 }

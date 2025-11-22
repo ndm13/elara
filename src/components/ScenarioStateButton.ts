@@ -57,6 +57,17 @@ export default class ScenarioStateButton extends ComponentCommand {
                     ]
                     break;
                 }
+                case 'authors-note': {
+                    short.content = `Here's the author's note!\n\`\`\`md\n${data.memory}\n\`\`\``;
+                    long.content = "Here's the author's note! Feels like overkill...";
+                    long.files = [
+                        new AttachmentBuilder()
+                            .setName(`scenario-${id}-authors-note.md`)
+                            .setDescription(`Author's note for scenario ${id}`)
+                            .setFile('buffer', Buffer.from(data.authorsNote, 'utf8'))
+                    ]
+                    break;
+                }
                 case 'prompt': {
                     short.content = `Here's the opening prompt!\n>>> ${data.prompt}`;
                     long.content = "Here's the opening prompt! Sorry for the attachment, it's too long to send!";

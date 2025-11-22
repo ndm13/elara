@@ -25,7 +25,8 @@ export default class AdvancedButton extends ComponentCommand {
                     });
                 }
                 case 'adventure': {
-                    const {flags, ...payload} = BodyBuilder.advancedAdventurePayload(id, type);
+                    const data = await ctx.api.getAdvancedAdventure(id);
+                    const {flags, ...payload} = BodyBuilder.advancedAdventurePayload(data, id, time);
                     return await ctx.write({
                         ...payload,
                         flags: ctx.interaction.message.flags | flags

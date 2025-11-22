@@ -4,6 +4,7 @@ import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
 import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 import {nsfwCheck} from "../common/nsfwCheck.ts";
+import {slug} from "../common/slug.ts";
 
 const options = {
     id: createStringOption({
@@ -27,7 +28,7 @@ export default class ScenarioCommand extends Command {
 
         try {
             const scenario = await ctx.api.getScenario(ctx.options.id);
-            const payload = BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${scenario.title.toLowerCase().replaceAll(/\W+/g, '-')}`, id);
+            const payload = BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${slug(scenario.title)}`, id);
             if (nsfwCheck(ctx, scenario)) {
                 return await ctx.write({
                     content: `This scenario is ${scenario.contentRating !== 'Unrated' ? 'rated ' : ''}${scenario.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,

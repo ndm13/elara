@@ -1,4 +1,4 @@
-import {AdvancedScenarioData, AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
+import {AdvancedAdventureData, AdvancedScenarioData, AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
 import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Thumbnail, User} from "npm:seyfert@3.2.6";
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
 import Stopwatch from "./Stopwatch.ts";
@@ -337,6 +337,26 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
+                            .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This scenario **does not use** plot essentials.')
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_memory_${id}`)
+                        .setLabel('Show Plot Essentials')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.memory)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(data.authorsNote ? `The author's note is ${textBlockMetadata(data.authorsNote)}` : "This scenario **does not have** an author's note.")
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`scenario_state_authors-note_${id}`)
+                        .setLabel("Show Author's Note")
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.authorsNote)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
                             .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
                     )
                     .setAccessory(new Button()
@@ -356,16 +376,6 @@ export default {
                         .setLabel('Show Custom Instructions')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(data.state.instructions?.type !== 'scenario')),
-                new Section()
-                    .setComponents(
-                        new TextDisplay()
-                            .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This scenario **does not use** plot essentials.')
-                    )
-                    .setAccessory(new Button()
-                        .setCustomId(`scenario_state_memory_${id}`)
-                        .setLabel('Show Plot Essentials')
-                        .setStyle(ButtonStyle.Secondary)
-                        .setDisabled(!data.memory)),
                 new Section()
                     .setComponents(
                         new TextDisplay()
@@ -409,20 +419,151 @@ export default {
             flags: MessageFlags.IsComponentsV2
         }
     },
-    advancedAdventurePayload: (id: string, type: string):InteractionCreateBodyRequest => {
+    advancedAdventurePayload: (data: AdvancedAdventureData, id: string, time: Stopwatch):InteractionCreateBodyRequest => {
         const container = new Container().addComponents(
-            new TextDisplay().setContent(`## Details for ${type} \`${id}\``),
-            new Separator(),
+            new TextDisplay().setContent(`I found more information on the adventure`),
+            new TextDisplay().setContent(`## ${data.title}`),
+            new Separator()
+        );
+
+        container.addComponents(
             new TextDisplay().setContent('### Story Cards'),
             new Section()
                 .setComponents(
-                    new TextDisplay().setContent(`This ${type} has some number of story cards. I'm too lazy to count them.`)
+                    new TextDisplay()
+                        .setContent(`This adventure has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's'}.`)
                 )
                 .setAccessory(new Button()
-                    .setCustomId(`story_cards_${type}_${id}`)
+                    .setCustomId(`story_cards_adventure_${id}`)
                     .setLabel('Get Story Cards')
-                    .setStyle(ButtonStyle.Primary))
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.storyCardCount === 0)),
+            new Separator(),
+            new TextDisplay().setContent('### Current State'),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This adventure **does not use** plot essentials.')
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`adventure_state_memory_${id}`)
+                    .setLabel('Show Plot Essentials')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!data.memory)),
+            new Section()
+                .setComponents(
+                    new TextDisplay()
+                        .setContent(data.authorsNote ? `The author's note is ${textBlockMetadata(data.authorsNote)}` : "This adventure **does not have** an author's note.")
+                )
+                .setAccessory(new Button()
+                    .setCustomId(`adventure_state_authors-note_${id}`)
+                    .setLabel("Show Author's Note")
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(!data.authorsNote))
         );
+
+        if (data.details) {
+            // data.state crashes GraphQL (probably permission denied), but older adventures store it in data.details.
+            // If it's present, show it.
+            const scgenEnhancements = [];
+            let scgenList = "";
+            if (data.details.storyCardInstructions) {
+                scgenEnhancements.push('custom instructions');
+                scgenList += `\n- The story card instructions are ${textBlockMetadata(data.state.storyCardInstructions)}`;
+            }
+            if (data.details.storyCardStoryInformation) {
+                scgenEnhancements.push('custom information');
+                scgenList += `\n- The story information is ${textBlockMetadata(data.state.storyCardStoryInformation)}`;
+            }
+
+            container.addComponents(
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`This adventure ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`adventure_state_scgen_${id}`)
+                        .setLabel('Show Generator Details')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(scgenEnhancements.length === 0)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(data.details.instructions?.type === 'custom' ?
+                                `The custom instructions are ${textBlockMetadata(data.details.instructions.custom)}` :
+                                'This adventure **does not have** custom instructions.')
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`adventure_state_instructions_${id}`)
+                        .setLabel('Show Custom Instructions')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(data.details.instructions?.type !== 'custom')),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(data.details.storySummary ?
+                                `The current story summary is ${textBlockMetadata(data.details.storySummary)}` :
+                                'This adventure **does not use** story summary.')
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`adventure_state_summary_${id}`)
+                        .setLabel('Show Story Summary')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.details.storySummary))
+            );
+        }
+
+        if (data.gameState) {
+            // Sometimes data.gameState doesn't populate
+            container.addComponents(
+                new Separator(),
+                new TextDisplay().setContent('### Scripting'),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(data.gameState ? `The game state is ${gameCodeMetadata(data.gameState)}.` : 'This adventure **does not have** an active game state.')
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`adventure_state_game-state_${id}`)
+                        .setLabel('Show Game State')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.gameState)),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(data.message ? `The active message is ${textBlockMetadata(data.message)}` : "This adventure **does not have** an active message.")
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`adventure_state_message_${id}`)
+                        .setLabel("Show Message")
+                        .setStyle(ButtonStyle.Secondary)
+                        .setDisabled(!data.message))
+            );
+        }
+
+        if (data.scenario) {
+            // Scenario is hidden sometimes
+            container.addComponents(
+                new Separator(),
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`*This adventure was created from the scenario* **${data.scenario.title}**.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`open_scenario_${data.scenario.shortId}`)
+                        .setLabel('Open Scenario')
+                        .setStyle(ButtonStyle.Primary))
+            )
+        }
+
+        container.addComponents(
+            new Separator(),
+            new TextDisplay()
+                .setContent(`-# ${time.elaraMessage}`)
+        );
+
         return {
             components: [container],
             flags: MessageFlags.IsComponentsV2

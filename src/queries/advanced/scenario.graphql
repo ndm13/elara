@@ -23,5 +23,6 @@ query Scenario($shortId: String) {
         title
         type
         storyCardCount
+        authorsNote
     }
 }
