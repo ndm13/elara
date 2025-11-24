@@ -80,13 +80,13 @@ export default class AdventureStateButton extends ComponentCommand {
                     break;
                 }
                 case 'game-state': {
-                    short.content = `Here's the game state!\n\`\`\`json\n${data.gameState}\n\`\`\``;
+                    short.content = `Here's the game state!\n\`\`\`json\n${JSON.stringify(data.gameState,undefined,2)}\n\`\`\``;
                     long.content = "Here's the game state! Looks like someone has a lot of scripts!";
                     long.files = [
                         new AttachmentBuilder()
                             .setName(`adventure-${id}-game-state.json`)
                             .setDescription(`Game state for adventure ${id}`)
-                            .setFile('buffer', Buffer.from(data.gameState, 'utf-8'))
+                            .setFile('buffer', Buffer.from(JSON.stringify(data.gameState,undefined,2), 'utf-8'))
                     ];
                     break;
                 }

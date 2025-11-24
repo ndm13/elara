@@ -537,7 +537,7 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(data.gameState ? `The game state is ${gameCodeMetadata(JSON.stringify(data.gameState))}.` : 'This adventure **does not have** an active game state.')
+                            .setContent(data.gameState ? `The game state is ${gameCodeMetadata(JSON.stringify(data.gameState,undefined,2))}.` : 'This adventure **does not have** an active game state.')
                     )
                     .setAccessory(new Button()
                         .setCustomId(`adventure_state_game-state_${id}`)
