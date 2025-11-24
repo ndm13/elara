@@ -421,10 +421,25 @@ export default {
     },
     advancedAdventurePayload: (data: AdvancedAdventureData, id: string, time: Stopwatch):InteractionCreateBodyRequest => {
         const container = new Container().addComponents(
-            new TextDisplay().setContent(`I found more information on the adventure`),
-            new TextDisplay().setContent(`## ${data.title}`),
+            new TextDisplay().setContent(`I found more information on the adventure\n## ${data.title}`),
             new Separator()
         );
+
+        if (data.scenario) {
+            // Scenario is hidden sometimes
+            container.addComponents(
+                new Section()
+                    .setComponents(
+                        new TextDisplay()
+                            .setContent(`*This adventure was created from the scenario* **${data.scenario.title}**.`)
+                    )
+                    .setAccessory(new Button()
+                        .setCustomId(`open_scenario_${data.scenario.shortId}`)
+                        .setLabel('Open Scenario')
+                        .setStyle(ButtonStyle.Primary)),
+                new Separator()
+            )
+        }
 
         container.addComponents(
             new TextDisplay().setContent('### Story Cards'),
@@ -522,7 +537,7 @@ export default {
                 new Section()
                     .setComponents(
                         new TextDisplay()
-                            .setContent(data.gameState ? `The game state is ${gameCodeMetadata(data.gameState)}.` : 'This adventure **does not have** an active game state.')
+                            .setContent(data.gameState ? `The game state is ${gameCodeMetadata(JSON.stringify(data.gameState))}.` : 'This adventure **does not have** an active game state.')
                     )
                     .setAccessory(new Button()
                         .setCustomId(`adventure_state_game-state_${id}`)
@@ -542,21 +557,28 @@ export default {
             );
         }
 
-        if (data.scenario) {
-            // Scenario is hidden sometimes
-            container.addComponents(
-                new Separator(),
-                new Section()
-                    .setComponents(
-                        new TextDisplay()
-                            .setContent(`*This adventure was created from the scenario* **${data.scenario.title}**.`)
-                    )
-                    .setAccessory(new Button()
-                        .setCustomId(`open_scenario_${data.scenario.shortId}`)
-                        .setLabel('Open Scenario')
-                        .setStyle(ButtonStyle.Primary))
+        container.addComponents(
+            new Separator(),
+            new TextDisplay()
+                .setContent(`### Download Adventure Text\nThis adventure contains ${data.actionCount} actions.`),
+            new ActionRow().setComponents(
+                new Button()
+                    .setCustomId(`read_md_${data.actionCount}_${id}`)
+                    .setLabel('Markdown')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.actionCount === 0),
+                new Button()
+                    .setCustomId(`read_plain_${data.actionCount}_${id}`)
+                    .setLabel('Plain Text')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.actionCount === 0),
+                new Button()
+                    .setCustomId(`read_html_${data.actionCount}_${id}`)
+                    .setLabel('HTML')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(data.actionCount === 0)
             )
-        }
+        );
 
         container.addComponents(
             new Separator(),

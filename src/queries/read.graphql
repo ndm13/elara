@@ -1,18 +1,20 @@
-query Adventure($shortId: String) {
+query Adventure($shortId: String, $pageSize: Int) {
     adventure(shortId: $shortId) {
         title
-        read {
+        read(pageSize: $pageSize) {
             actions {
                 imageText
                 imageUrl
                 text
                 type
-                undoneAt
-                deletedAt
+                updatedAt
+                createdAt
                 userId
+                id
             }
         }
         allPlayers {
+            characterName
             user {
                 id
                 profile {

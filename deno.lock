@@ -7,6 +7,7 @@
     "jsr:@std/fs@^1.0.11": "1.0.19",
     "jsr:@std/io@~0.225.2": "0.225.2",
     "jsr:@std/log@~0.224.14": "0.224.14",
+    "npm:nunjucks@^3.2.4": "3.2.4",
     "npm:seyfert@*": "3.2.6",
     "npm:seyfert@3.2.6": "3.2.6",
     "npm:seyfert@^3.2.6": "3.2.6"
@@ -37,6 +38,24 @@
     }
   },
   "npm": {
+    "a-sync-waterfall@1.0.1": {
+      "integrity": "sha512-RYTOHHdWipFUliRFMCS4X2Yn2X8M87V/OpSqWzKKOGhzqyUxzyVmhHDH9sAvG+ZuQf/TAOFsLCpMw09I1ufUnA=="
+    },
+    "asap@2.0.6": {
+      "integrity": "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA=="
+    },
+    "commander@5.1.0": {
+      "integrity": "sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg=="
+    },
+    "nunjucks@3.2.4": {
+      "integrity": "sha512-26XRV6BhkgK0VOxfbU5cQI+ICFUtMLixv1noZn1tGU38kQH5A5nmmbk/O45xdyBhD1esk47nKrY0mvQpZIhRjQ==",
+      "dependencies": [
+        "a-sync-waterfall",
+        "asap",
+        "commander"
+      ],
+      "bin": true
+    },
     "seyfert@3.2.6": {
       "integrity": "sha512-C0mghHl2mz+Qv3U+aOyCKAH3Xc2RGipfSwffXyOs4VuKygQyUbsVOpmzBNtDtdsTNtdsE/g35PAasDfi+7cv7A=="
     }
@@ -45,6 +64,7 @@
     "dependencies": [
       "jsr:@std/encoding@*",
       "jsr:@std/log@~0.224.14",
+      "npm:nunjucks@^3.2.4",
       "npm:seyfert@^3.2.6"
     ]
   }

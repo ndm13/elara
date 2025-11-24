@@ -32,7 +32,7 @@ export default class AdventureCommand extends Command {
 
         try {
             const adventure = await ctx.api.getAdventure(ctx.options.id);
-            let payload = BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replaceAll(/\W+/g, '-')}`, id);
+            let payload = BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replaceAll(/\W+/g, '-')}`, ctx.options.id);
             if (nsfwCheck(ctx, adventure)) {
                 return await ctx.write({
                     content: `This adventure is ${adventure.contentRating !== 'Unrated' ? 'rated ' : ''}${adventure.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,

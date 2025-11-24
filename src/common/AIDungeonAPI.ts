@@ -8,6 +8,7 @@ import verifyAdventureState from "../queries/verify/adventureState.graphql" with
 import verifyStoryCards from "../queries/verify/storyCards.graphql" with {type: 'text'};
 import advancedScenario from "../queries/advanced/scenario.graphql" with {type: 'text'};
 import advancedAdventure from "../queries/advanced/adventure.graphql" with {type: 'text'};
+import read from "../queries/read.graphql" with {type: 'text'};
 import log from "./logger.ts";
 
 export class AIDungeonAPI {
@@ -124,6 +125,18 @@ export class AIDungeonAPI {
             query: advancedAdventure
         };
         return AIDungeonAPI.validateResponse(query, await this.query<AdvancedAdventureData>(query), shortId, 'adventure')
+    }
+
+    async getReadAdventure(shortId: string, pageSize: number): Promise<ReadAdventureData> {
+        const query = {
+            operationName: "Adventure",
+            variables: {
+                "shortId": shortId,
+                "pageSize": pageSize,
+            },
+            query: read
+        };
+        return AIDungeonAPI.validateResponse(query, await this.query<ReadAdventureData>(query), shortId, 'adventure')
     }
 
     async getScenario(shortId: string): ScenarioData {
@@ -441,4 +454,32 @@ export type AdvancedAdventureData = {
     gameState: object,
     message: string,
     storyCardCount: number
+};
+
+export type ReadAdventureData = {
+    title: string,
+    read: {
+        actions: {
+            imageText: string,
+            imageUrl: string,
+            text: string,
+            type: string,
+            createdAt: string,
+            updatedAt: string,
+            userId: string,
+            id: string
+        }[],
+    },
+    allPlayers: MultiplayerEntry[]
+}
+
+export type MultiplayerEntry = {
+    characterName: string,
+        user: {
+            id: string,
+            profile: {
+            title: string,
+                thumbImageUrl: string
+        }
+    }
 };
