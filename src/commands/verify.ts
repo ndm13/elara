@@ -1,4 +1,5 @@
 import {ActionRow, Command, CommandContext, Declare, Modal, TextDisplay, TextInput} from 'npm:seyfert';
+import {TextInputStyle} from "npm:seyfert@3.2.6/lib/types/index.js";
 import {generateToken} from "../common/verification.ts";
 
 @Declare({
