@@ -58,7 +58,7 @@ export default class ScenarioStateButton extends ComponentCommand {
                     break;
                 }
                 case 'authors-note': {
-                    short.content = `Here's the author's note!\n\`\`\`md\n${data.memory}\n\`\`\``;
+                    short.content = `Here's the author's note!\n\`\`\`md\n${data.authorsNote}\n\`\`\``;
                     long.content = "Here's the author's note! Feels like overkill...";
                     long.files = [
                         new AttachmentBuilder()
