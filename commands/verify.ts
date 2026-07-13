@@ -1,4 +1,4 @@
-import {Command, Declare, Modal, TextInput, Label} from 'seyfert';
+import {Command, Declare, Modal, TextInput, Label, TextDisplay} from 'seyfert';
 import type { CommandContext } from 'seyfert';
 import {TextInputStyle} from "seyfert/lib/types/index.js";
 import {generateToken} from "../common/verification.ts";
@@ -17,9 +17,18 @@ export default class VerifyCommand extends Command {
             .setCustomId('verify_link_modal')
             .setTitle("Verify your account")
             .addComponents(
+                new TextDisplay()
+                    .setContent(`To verify your account, I'm going to ask you to start an adventure and paste a **verification token**. This lets me know that the person who created the adventure (you) is the same as the one using this account (you)!
+
+If you've already verified your account, you can reuse a link you already made. I don't mind!
+## Your verification token is:
+### \`${token}\`
+## Start Verification
+Click the link for the site where you're signed in:
+- **[Production](https://play.aidungeon.com/scenario/Fn8ySPXhunQN/verify-discord-account/play)** (choose this if you're not sure)
+- **[Beta](https://beta.aidungeon.com/scenario/Fn8ySPXhunQN/verify-discord-account/play)** / **[Alpha](https://alpha.aidungeon.com/scenario/Fn8ySPXhunQN/verify-discord-account/play)**`),
                 new Label()
                     .setLabel("Paste the link here when you're done!")
-                    .setDescription(`To verify your account, start a new adventure and paste this verification token:\nToken: ${token}\n\nProduction link: https://play.aidungeon.com/scenario/Fn8ySPXhunQN/verify-discord-account/play`)
                     .setComponent(
                         new TextInput()
                             .setCustomId('link')
