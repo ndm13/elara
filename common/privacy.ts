@@ -1,4 +1,4 @@
-import {createStringOption} from "npm:seyfert";
+import {CommandContext, createStringOption} from "seyfert";
 import {MessageFlags} from 'seyfert/lib/types/index.js';
 
 export const privacy = createStringOption({

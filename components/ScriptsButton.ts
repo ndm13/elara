@@ -7,11 +7,11 @@ import {customIdRouter} from "../common/customId.ts";
 export default class ScriptsButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('scripts_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         const parsed = customIdRouter.scripts.parse(ctx.customId);
         if (!parsed) return;
         const {id} = parsed;
@@ -48,7 +48,7 @@ export default class ScriptsButton extends ComponentCommand {
             return await ctx.write({
                 content: "Here are the scripts!",
                 files,
-                flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
+                flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
             });
         } catch (e) {
             console.error(e);

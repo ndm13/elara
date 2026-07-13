@@ -24,7 +24,7 @@ const options = {
 @Options(options)
 export default class PeekCommand extends Command {
 
-    async run(ctx: CommandContext<typeof options>) {
+    override async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
         const parsed = parseDungeonUrl(ctx.options.link);
 
@@ -61,11 +61,11 @@ export default class PeekCommand extends Command {
         } catch (e) {
             console.error(e);
             return await ctx.write({
-                content: "Mrrgh, I *thought* I found something, but when I asked AI Dungeon for details they yelled at me! 😭\n-# Maybe it's private or deleted? I tried to look up `" + url.pathname + "`...\n```\n" + e.message + "\n```",
+                content: "Mrrgh, I *thought* I found something, but when I asked AI Dungeon for details they yelled at me! 😭\n-# Maybe it's private or deleted? I tried to look up `" + id + "` from `" + path + "`...\n```\n" + (e as Error)?.message + "\n```",
                 flags: MessageFlags.Ephemeral
             });
         }
-        if (nsfwCheck(ctx, rated)) {
+        if (rated !== undefined && nsfwCheck(ctx, rated)) {
             return await ctx.write({
                 content: `This ${type} is ${rated.contentRating !== 'Unrated' ? 'rated ' : ''}${rated.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
                 ...payload,

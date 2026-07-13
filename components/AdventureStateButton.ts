@@ -8,19 +8,19 @@ import {customIdRouter} from "../common/customId.ts";
 export default class AdventureStateButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('adventure_state_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         const parsed = customIdRouter.adventureState.parse(ctx.customId);
         if (!parsed) return;
         const {type, id} = parsed;
 
         try {
             const data = await ctx.api.getAdvancedAdventure(id);
-            let short: InteractionCreateBodyRequest = {
-                flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
+            const short: InteractionCreateBodyRequest = {
+                flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
             }, long: InteractionCreateBodyRequest = {...short};
 
             switch (type) {

@@ -7,14 +7,12 @@ import {customIdRouter} from "../common/customId.ts";
 export default class StoryCardsButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('story_cards_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
-        await ctx.deferReply({
-            ephemeral: ctx.interaction.flags & MessageFlags.Ephemeral === MessageFlags.Ephemeral
-        });
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
+        await ctx.deferReply(((ctx.interaction.message.flags || 0) & MessageFlags.Ephemeral) === MessageFlags.Ephemeral);
         const parsed = customIdRouter.storyCards.parse(ctx.customId);
         if (!parsed) return;
         const {type, id} = parsed;
@@ -32,7 +30,7 @@ export default class StoryCardsButton extends ComponentCommand {
                                 .setDescription(`Story cards for the scenario with ID ${id}`)
                                 .setFile('buffer', Buffer.from(data, 'utf8'))
                         ],
-                        flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
+                        flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
                     });
                 }
                 case 'adventure': {
@@ -46,7 +44,7 @@ export default class StoryCardsButton extends ComponentCommand {
                                 .setDescription(`Story cards for the adventure with ID ${id}`)
                                 .setFile('buffer', Buffer.from(data, 'utf8'))
                         ],
-                        flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
+                        flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
                     });
                 }
                 default: {

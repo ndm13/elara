@@ -41,7 +41,7 @@ export async function verifyToken(token: string, discordId: string): Promise<boo
 
         return await crypto.subtle.verify("HMAC", key, expected, text.encode(discordId + salt));
     } catch (error) {
-        console.error("Token verification failed:", error.message);
+        console.error("Token verification failed:", (error as Error)?.message);
         return false;
     }
 }

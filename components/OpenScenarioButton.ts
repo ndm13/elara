@@ -9,11 +9,11 @@ import {customIdRouter} from "../common/customId.ts";
 export default class OpenScenarioButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('open_scenario_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         const time = new Stopwatch();
         const parsed = customIdRouter.openScenario.parse(ctx.customId);
         if (!parsed) return;
@@ -22,8 +22,8 @@ export default class OpenScenarioButton extends ComponentCommand {
         try {
             const scenario = await ctx.api.getScenario(id);
             return await ctx.write({
-                flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2,
-                ...BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${id}/${slug(scenario.title)}`)
+                flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2,
+                ...BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${id}/${slug(scenario.title)}`, id)
             });
         } catch (e) {
             console.error(e);

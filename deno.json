@@ -1,5 +1,7 @@
 {
   "imports": {
+    "@std/collections": "jsr:@std/collections@^1.3.0",
+    "collections": "jsr:@std/collections",
     "log": "jsr:@std/log@^0.224.14",
     "seyfert": "npm:seyfert@3.2.6",
     "seyfert/": "npm:/seyfert@3.2.6/",

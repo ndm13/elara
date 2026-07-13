@@ -30,11 +30,11 @@ const readHtml = new Template(readHtmlTemplate, env);
 export default class ReadButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('read_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         await ctx.deferReply();
 
         const parsed = customIdRouter.read.parse(ctx.customId);
@@ -42,7 +42,7 @@ export default class ReadButton extends ComponentCommand {
         const {type, actions, id} = parsed;
 
         try {
-            const data = await ctx.api.getReadAdventure(id, Number.parseInt(actions) + 10) as ReadAdventureData;
+            const data = await ctx.api.getReadAdventure(id, actions + 10) as ReadAdventureData;
 
             let content, files;
 
@@ -124,7 +124,7 @@ export default class ReadButton extends ComponentCommand {
                 }
                 case 'html': {
                     const authors = listFormatter.format(data.allPlayers.map(player => player.user.profile.title));
-                    let html = readHtml.render({
+                    const html = readHtml.render({
                         ...data,
                         authors,
                         link: `https://play.aidungeon.com/adventure/${id}/${slug(data.title)}`
@@ -147,7 +147,7 @@ export default class ReadButton extends ComponentCommand {
             return await ctx.editOrReply({
                 content,
                 files,
-                flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2
+                flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
             });
         } catch (e) {
             console.error(e);

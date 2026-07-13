@@ -14,7 +14,7 @@ export default class VerifyLinkModal extends ModalCommand {
         const link = ctx.interaction.components.find(c => c.type === 1).components[0].value;
         const parsed = parseDungeonUrl(link);
 
-        if (!parsed || parsed.type !== 'adventure' || parsed.hostname !== 'play.aidungeon.com')
+        if (!parsed || parsed.type !== 'adventure' || !parsed.hostname.endsWith('.aidungeon.com'))
             return await ctx.write({
                 content: "Wait, that doesn't look like a valid AI Dungeon adventure link to me! Please copy the link from AI Dungeon.",
                 flags: MessageFlags.Ephemeral

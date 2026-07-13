@@ -8,11 +8,11 @@ import {customIdRouter} from "../common/customId.ts";
 export default class AdvancedButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('advanced_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         const time = new Stopwatch();
         const parsed = customIdRouter.advanced.parse(ctx.customId);
         if (!parsed) return;
@@ -25,7 +25,7 @@ export default class AdvancedButton extends ComponentCommand {
                     const {flags, ...payload} = BodyBuilder.advancedScenarioPayload(data, id, time);
                     return await ctx.write({
                         ...payload,
-                        flags: ctx.interaction.message.flags | flags
+                        flags: (ctx.interaction.message.flags || 0) | (flags || 0)
                     });
                 }
                 case 'adventure': {
@@ -33,7 +33,7 @@ export default class AdvancedButton extends ComponentCommand {
                     const {flags, ...payload} = BodyBuilder.advancedAdventurePayload(data, id, time);
                     return await ctx.write({
                         ...payload,
-                        flags: ctx.interaction.message.flags | flags
+                        flags: (ctx.interaction.message.flags || 0) | (flags || 0)
                     });
                 }
                 default: {

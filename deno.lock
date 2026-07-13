@@ -1,18 +1,23 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/collections@*": "1.1.3",
+    "jsr:@std/collections@*": "1.3.0",
+    "jsr:@std/collections@^1.3.0": "1.3.0",
     "jsr:@std/encoding@*": "1.0.10",
     "jsr:@std/fmt@^1.0.5": "1.0.8",
     "jsr:@std/fs@^1.0.11": "1.0.19",
     "jsr:@std/io@~0.225.2": "0.225.2",
     "jsr:@std/log@~0.224.14": "0.224.14",
     "npm:nunjucks@^3.2.4": "3.2.4",
+    "npm:seyfert@*": "3.2.6",
     "npm:seyfert@3.2.6": "3.2.6"
   },
   "jsr": {
     "@std/collections@1.1.3": {
       "integrity": "bf8b0818886df6a32b64c7d3b037a425111f28278d69fd0995aeb62777c986b0"
+    },
+    "@std/collections@1.3.0": {
+      "integrity": "eb36b43d784477ea0b476483ac034a14bdd182aff921c812ecf662a1fcef9498"
     },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
@@ -60,6 +65,8 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/collections@*",
+      "jsr:@std/collections@^1.3.0",
       "jsr:@std/encoding@*",
       "jsr:@std/log@~0.224.14",
       "npm:nunjucks@^3.2.4",

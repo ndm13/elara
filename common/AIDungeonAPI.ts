@@ -428,7 +428,7 @@ export type AdvancedScenarioData = {
         }
     }[],
     state: {
-        instructions: object,
+        instructions: Record<string, string>,
         storyCardInstructions: string,
         storyCardStoryInformation: string,
         storySummary: string
@@ -448,7 +448,7 @@ export type AdvancedAdventureData = {
         title: string,
         shortId: string
     },
-    details: object,
+    details: Record<string, string> & {instructions?: Record<string, string>},
     title: string,
     authorsNote: string,
     gameState: object,
@@ -466,6 +466,8 @@ export type ReadAdventureData = {
             type: string,
             createdAt: string,
             updatedAt: string,
+            undoneAt?: string;
+            deletedAt?: string;
             userId: string,
             id: string
         }[],

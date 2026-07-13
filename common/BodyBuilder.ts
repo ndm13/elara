@@ -3,7 +3,7 @@ import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Th
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
 import Stopwatch from "./Stopwatch.ts";
 import {MessageFlags, ButtonStyle} from "seyfert/lib/types/index.js";
-import { chunk } from "jsr:@std/collections";
+import { chunk } from "collections";
 import { customIdRouter } from "./customId.ts";
 
 function getCover(image: string) {
@@ -34,7 +34,7 @@ export default {
             embeds: [
                 new Embed()
                     .setTitle(scenario.title)
-                    .setDescription(scenario.description)
+                    .setDescription(scenario.description || undefined)
                     .setAuthor({
                         name: "A Scenario by " + scenario.user.profile.title,
                         iconUrl: scenario.user.profile.thumbImageUrl
@@ -57,7 +57,7 @@ export default {
                         {
                             inline: true,
                             name: 'Published',
-                            value: scenario.published ? new Date(scenario.publishedAt).toLocaleString().replace(', ', ' ') : 'No'
+                            value: scenario.published ? new Date(scenario.publishedAt || 0).toLocaleString().replace(', ', ' ') : 'No'
                         },
                         {
                             inline: true,
@@ -72,22 +72,22 @@ export default {
                         {
                             inline: true,
                             name: 'Plays',
-                            value: scenario.adventuresPlayed
+                            value: scenario.adventuresPlayed + ""
                         },
                         {
                             inline: true,
                             name: 'Votes',
-                            value: scenario.voteCount
+                            value: scenario.voteCount + ""
                         },
                         {
                             inline: true,
                             name: 'Bookmarks',
-                            value: scenario.saveCount
+                            value: scenario.saveCount + ""
                         },
                         {
                             inline: true,
                             name: 'Comments',
-                            value: scenario.commentCount
+                            value: scenario.commentCount + ""
                         }
                     ])
             ],
@@ -123,7 +123,7 @@ export default {
             embeds: [
                 new Embed()
                     .setTitle(adventure.title)
-                    .setDescription(adventure.description)
+                    .setDescription(adventure.description || undefined)
                     .setAuthor({
                         name: "An Adventure by " + adventure.user.profile.title,
                         iconUrl: adventure.user.profile.thumbImageUrl
@@ -146,7 +146,7 @@ export default {
                         {
                             inline: true,
                             name: 'Published',
-                            value: adventure.published ? new Date(adventure.publishedAt).toLocaleString().replace(', ', ' ') : 'No'
+                            value: adventure.published ? new Date(adventure.publishedAt || 0).toLocaleString().replace(', ', ' ') : 'No'
                         },
                         {
                             inline: true,
@@ -161,22 +161,22 @@ export default {
                         {
                             inline: true,
                             name: 'Actions',
-                            value: adventure.actionCount
+                            value: adventure.actionCount + ""
                         },
                         {
                             inline: true,
                             name: 'Votes',
-                            value: adventure.voteCount
+                            value: adventure.voteCount + ""
                         },
                         {
                             inline: true,
                             name: 'Bookmarks',
-                            value: adventure.saveCount
+                            value: adventure.saveCount + ""
                         },
                         {
                             inline: true,
                             name: 'Comments',
-                            value: adventure.commentCount
+                            value: adventure.commentCount + ""
                         }
                     ])
             ],
@@ -221,17 +221,17 @@ export default {
                         {
                             inline: true,
                             name: 'Friends',
-                            value: user.friendCount
+                            value: user.friendCount + ""
                         },
                         {
                             inline: true,
                             name: 'Following',
-                            value: user.followingCount
+                            value: user.followingCount + ""
                         },
                         {
                             inline: true,
                             name: 'Followers',
-                            value: user.followersCount
+                            value: user.followersCount + ""
                         }
                     ])
             ],

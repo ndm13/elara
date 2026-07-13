@@ -24,7 +24,7 @@ const options = {
 @Options(options)
 export default class ScenarioCommand extends Command {
 
-    async run(ctx: CommandContext<typeof options>) {
+    override async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
 
         try {

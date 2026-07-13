@@ -8,11 +8,11 @@ import {customIdRouter} from "../common/customId.ts";
 export default class OpenProfileButton extends ComponentCommand {
     componentType = 'Button' as const;
 
-    filter(ctx: ComponentContext<typeof this.componentType>) {
+    override filter(ctx: ComponentContext<typeof this.componentType>) {
         return ctx.customId.startsWith('open_profile_');
     }
 
-    async run(ctx: ComponentContext<typeof this.componentType>) {
+    override async run(ctx: ComponentContext<typeof this.componentType>) {
         const time = new Stopwatch();
         const parsed = customIdRouter.openProfile.parse(ctx.customId);
         if (!parsed) return;
