@@ -30,6 +30,17 @@ function textBlockMetadata(text: string) {
 
 export default {
     scenarioDetailsPayload: (scenario: ScenarioData, time: Stopwatch, path: string, id: string): InteractionCreateBodyRequest => {
+        let finalPath = path;
+        if (!scenario.published) {
+            if (!finalPath.includes('unlisted=true')) {
+                finalPath += (finalPath.includes('?') ? '&' : '?') + 'unlisted=true';
+            }
+        } else {
+            if (!finalPath.includes('published=true')) {
+                finalPath += (finalPath.includes('?') ? '&' : '?') + 'published=true';
+            }
+        }
+
         return {
             embeds: [
                 new Embed()
@@ -97,15 +108,15 @@ export default {
                         new Button()
                             .setLabel('Production')
                             .setStyle(ButtonStyle.Link)
-                            .setURL("https://play.aidungeon.com" + path),
+                            .setURL("https://play.aidungeon.com" + finalPath),
                         new Button()
                             .setLabel('Beta')
                             .setStyle(ButtonStyle.Link)
-                            .setURL("https://beta.aidungeon.com" + path),
+                            .setURL("https://beta.aidungeon.com" + finalPath),
                         new Button()
                             .setLabel('Alpha')
                             .setStyle(ButtonStyle.Link)
-                            .setURL("https://alpha.aidungeon.com" + path),
+                            .setURL("https://alpha.aidungeon.com" + finalPath),
                         new Button()
                             .setLabel(`${scenario.user.profile.title}'s Profile`)
                             .setStyle(ButtonStyle.Primary)
@@ -113,7 +124,7 @@ export default {
                         new Button()
                             .setLabel(`More...`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId(customIdRouter.advanced.build('scenario', id))
+                            .setCustomId(customIdRouter.advanced.build('scenario', id, scenario.published))
                     ])
             ]
         };
@@ -279,7 +290,7 @@ export default {
         }
 
     },
-    advancedScenarioPayload: (data: AdvancedScenarioData, id: string, time: Stopwatch):InteractionCreateBodyRequest => {
+    advancedScenarioPayload: (data: AdvancedScenarioData, id: string, time: Stopwatch, published?: boolean):InteractionCreateBodyRequest => {
         const container = new Container().addComponents(
             new TextDisplay().setContent(`I found more information on the scenario`),
             new TextDisplay().setContent(`## ${data.title}`),
@@ -341,7 +352,7 @@ export default {
                             .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This scenario **does not use** plot essentials.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(customIdRouter.scenarioState.build('memory', id))
+                        .setCustomId(customIdRouter.scenarioState.build('memory', id, published))
                         .setLabel('Show Plot Essentials')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.memory)),
@@ -351,7 +362,7 @@ export default {
                             .setContent(data.authorsNote ? `The author's note is ${textBlockMetadata(data.authorsNote)}` : "This scenario **does not have** an author's note.")
                     )
                     .setAccessory(new Button()
-                        .setCustomId(customIdRouter.scenarioState.build('authors-note', id))
+                        .setCustomId(customIdRouter.scenarioState.build('authors-note', id, published))
                         .setLabel("Show Author's Note")
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.authorsNote)),
@@ -361,7 +372,7 @@ export default {
                             .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(customIdRouter.scenarioState.build('scgen', id))
+                        .setCustomId(customIdRouter.scenarioState.build('scgen', id, published))
                         .setLabel('Show Generator Details')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(scgenEnhancements.length === 0)),
@@ -373,7 +384,7 @@ export default {
                                 'This scenario **does not have** custom instructions.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(customIdRouter.scenarioState.build('instructions', id))
+                        .setCustomId(customIdRouter.scenarioState.build('instructions', id, published))
                         .setLabel('Show Custom Instructions')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(data.state.instructions?.type !== 'scenario')),
@@ -383,7 +394,7 @@ export default {
                             .setContent(`The opening prompt is ${textBlockMetadata(data.prompt)}`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(customIdRouter.scenarioState.build('prompt', id))
+                        .setCustomId(customIdRouter.scenarioState.build('prompt', id, published))
                         .setLabel('Show Opening Prompt')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.prompt))
@@ -401,7 +412,7 @@ export default {
                 .filter(option => option.parentScenario?.shortId === id)
                 .filter(option => option.deletedAt === null)
                 .map(option => new Button()
-                    .setCustomId(customIdRouter.advanced.build('scenario', option.shortId))
+                    .setCustomId(customIdRouter.advanced.build('scenario', option.shortId, published))
                     .setLabel(option.title)
                     .setStyle(ButtonStyle.Primary)), 5);
             for (const row of rows) {

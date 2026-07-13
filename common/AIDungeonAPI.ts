@@ -105,11 +105,16 @@ export class AIDungeonAPI {
         return AIDungeonAPI.validateResponse(query, await this.query<StoryCardsData>(query), shortId, 'adventure')
     }
 
-    async getAdvancedScenario(shortId: string): Promise<AdvancedScenarioData> {
+    async getAdvancedScenario(shortId: string, published?: boolean): Promise<AdvancedScenarioData> {
+        if (published === undefined) {
+            return this.getAdvancedScenario(shortId, true).catch(() => this.getAdvancedScenario(shortId, false));
+        }
+
         const query = {
             operationName: "Scenario",
             variables: {
-                "shortId": shortId
+                "shortId": shortId,
+                "viewPublished": published
             },
             query: advancedScenario
         };
@@ -139,10 +144,14 @@ export class AIDungeonAPI {
         return AIDungeonAPI.validateResponse(query, await this.query<ReadAdventureData>(query), shortId, 'adventure')
     }
 
-    async getScenario(shortId: string): Promise<ScenarioData> {
+    async getScenario(shortId: string, published?: boolean): Promise<ScenarioData> {
+        if (published === undefined) {
+            return this.getScenario(shortId, true).catch(() => this.getScenario(shortId, false));
+        }
+
         const query = {
             operationName: "GetScenario",
-            variables: {"shortId": shortId},
+            variables: { "shortId": shortId, "viewPublished": published },
             query: scenario,
         };
         return AIDungeonAPI.validateResponse(query, await this.query<ScenarioData>(query), shortId, 'scenario');

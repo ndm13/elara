@@ -45,31 +45,3 @@ export async function verifyToken(token: string, discordId: string): Promise<boo
         return false;
     }
 }
-
-// --- Example Usage ---
-
-/*
-const user1 = "12345";
-
-// User 1 starts verification for their first account
-const token1 = await generateToken(user1);
-console.log(`Token 1: ${token1}`);
-
-// User 1 starts verification for a *second* account
-const token2 = await generateToken(user1);
-console.log(`Token 2: ${token2}`); // This is a different token!
-
-// --- Verification Checks ---
-
-// User 1 verifies their first account
-const check1 = await verifyToken(token1, user1);
-console.log(`Check 1 (correct): ${check1}`); // true
-
-// User 1 verifies their second account
-const check2 = await verifyToken(token2, user1);
-console.log(`Check 2 (correct): ${check2}`); // true
-
-// User 2 ("67890") tries to use User 1's token
-const check3 = await verifyToken(token1, "67890");
-console.log(`Check 3 (wrong user): ${check3}`); // false
-*/

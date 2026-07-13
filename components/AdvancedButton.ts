@@ -16,13 +16,13 @@ export default class AdvancedButton extends ComponentCommand {
         const time = new Stopwatch();
         const parsed = customIdRouter.advanced.parse(ctx.customId);
         if (!parsed) return;
-        const {type, id} = parsed;
+        const {type, id, published} = parsed;
 
         try {
             switch (type) {
                 case 'scenario': {
-                    const data = await ctx.api.getAdvancedScenario(id);
-                    const {flags, ...payload} = BodyBuilder.advancedScenarioPayload(data, id, time);
+                    const data = await ctx.api.getAdvancedScenario(id, published);
+                    const {flags, ...payload} = BodyBuilder.advancedScenarioPayload(data, id, time, published);
                     return await ctx.write({
                         ...payload,
                         flags: (ctx.interaction.message.flags || 0) | (flags || 0)

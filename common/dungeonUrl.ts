@@ -3,6 +3,7 @@ export interface ParsedDungeonUrl {
   id: string;
   path: string;
   hostname: string;
+  published?: boolean;
 }
 
 /**
@@ -15,11 +16,19 @@ export function parseDungeonUrl(urlString: string): ParsedDungeonUrl | null {
     const matches = /\/(((?<type>scenario|adventure)\/(?<id>[\w-]+)\/.+)|((?<type>profile)\/(?<id>[\w-]+)))/.exec(url.pathname);
     if (!matches || !matches.groups) return null;
     
+    let published: boolean | undefined = undefined;
+    if (url.searchParams.get("published") === "true") {
+      published = true;
+    } else if (url.searchParams.get("unlisted") === "true") {
+      published = false;
+    }
+
     return {
       type: matches.groups.type as 'scenario' | 'adventure' | 'profile',
       id: matches.groups.id,
       path: url.pathname + url.search,
-      hostname: url.hostname.toLowerCase()
+      hostname: url.hostname.toLowerCase(),
+      published
     };
   } catch {
     return null;

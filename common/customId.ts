@@ -4,6 +4,7 @@
 export type CustomIdAdvanced = {
   type: 'scenario' | 'adventure';
   id: string;
+  published?: boolean;
 };
 
 export type CustomIdAdventureState = {
@@ -20,6 +21,7 @@ export type CustomIdRead = {
 export type CustomIdScenarioState = {
   type: 'scgen' | 'instructions' | 'memory' | 'authors-note' | 'prompt';
   id: string;
+  published?: boolean;
 };
 
 export type CustomIdStoryCards = {
@@ -44,13 +46,17 @@ export type CustomIdScripts = {
  */
 export const customIdRouter = {
   advanced: {
-    build: (type: 'scenario' | 'adventure', id: string): string => `advanced_${type}_${id}`,
+    build: (type: 'scenario' | 'adventure', id: string, published?: boolean): string => {
+      const suffix = published === true ? '_pub' : published === false ? '_unl' : '';
+      return `advanced_${type}_${id}${suffix}`;
+    },
     parse: (customId: string): CustomIdAdvanced | null => {
-      const match = /^advanced_(?<type>[^_]+)_(?<id>.*)$/.exec(customId);
-      if (!match) return null;
+      const match = /^advanced_(?<type>[^_]+)_(?<id>.+?)(?:_(?<pub>pub|unl))?$/.exec(customId);
+      if (!match || !match.groups) return null;
       return {
-        type: match.groups!.type as 'scenario' | 'adventure',
-        id: match.groups!.id,
+        type: match.groups.type as 'scenario' | 'adventure',
+        id: match.groups.id,
+        published: match.groups.pub === 'pub' ? true : match.groups.pub === 'unl' ? false : undefined
       };
     }
   },
@@ -79,14 +85,17 @@ export const customIdRouter = {
     }
   },
   scenarioState: {
-    build: (type: CustomIdScenarioState['type'], id: string): string => 
-      `scenario_state_${type}_${id}`,
+    build: (type: CustomIdScenarioState['type'], id: string, published?: boolean): string => {
+      const suffix = published === true ? '_pub' : published === false ? '_unl' : '';
+      return `scenario_state_${type}_${id}${suffix}`;
+    },
     parse: (customId: string): CustomIdScenarioState | null => {
-      const match = /^scenario_state_(?<type>[^_]+)_(?<id>.*)$/.exec(customId);
-      if (!match) return null;
+      const match = /^scenario_state_(?<type>[^_]+)_(?<id>.+?)(?:_(?<pub>pub|unl))?$/.exec(customId);
+      if (!match || !match.groups) return null;
       return {
-        type: match.groups!.type as CustomIdScenarioState['type'],
-        id: match.groups!.id,
+        type: match.groups.type as CustomIdScenarioState['type'],
+        id: match.groups.id,
+        published: match.groups.pub === 'pub' ? true : match.groups.pub === 'unl' ? false : undefined
       };
     }
   },

@@ -1,5 +1,5 @@
-query Scenario($shortId: String) {
-    scenario(shortId: $shortId) {
+query Scenario($shortId: String, $viewPublished: Boolean) {
+    scenario(shortId: $shortId, viewPublished: $viewPublished) {
         gameCodeOnInput
         gameCodeOnModelContext
         gameCodeOnOutput

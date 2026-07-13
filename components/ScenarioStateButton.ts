@@ -15,11 +15,11 @@ export default class ScenarioStateButton extends ComponentCommand {
     override async run(ctx: ComponentContext<typeof this.componentType>) {
         const parsed = customIdRouter.scenarioState.parse(ctx.customId);
         if (!parsed) return;
-        const {type, id} = parsed;
+        const {type, id, published} = parsed;
 
         try {
-            const data = await ctx.api.getAdvancedScenario(id);
-            let short: InteractionCreateBodyRequest = {
+            const data = await ctx.api.getAdvancedScenario(id, published);
+            const short: InteractionCreateBodyRequest = {
                 flags: (ctx.interaction.message?.flags || 0) & ~MessageFlags.IsComponentsV2
             }, long: any = {...short};
 

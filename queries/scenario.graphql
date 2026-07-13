@@ -1,5 +1,5 @@
-query GetScenario($shortId: String) {
-    scenario(shortId: $shortId) {
+query GetScenario($shortId: String, $viewPublished: Boolean) {
+    scenario(shortId: $shortId, viewPublished: $viewPublished) {
         createdAt
         editedAt
         title

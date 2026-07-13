@@ -28,13 +28,13 @@ export default class LinkPeekCommand extends ContextMenuCommand {
             });
         }
 
-        const {type, id, path} = extracted.parsed;
+        const {type, id, path, published} = extracted.parsed;
 
         console.log('linkpeek', id)
         try {
             switch (type) {
                 case 'scenario': {
-                    const scenario = await ctx.api.getScenario(id);
+                    const scenario = await ctx.api.getScenario(id, published);
                     return await ctx.write({
                         flags: MessageFlags.Ephemeral,
                         ...BodyBuilder.scenarioDetailsPayload(scenario, time, path, id)

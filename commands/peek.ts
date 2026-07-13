@@ -35,13 +35,13 @@ export default class PeekCommand extends Command {
             });
         }
 
-        const {type, id, path} = parsed;
+        const {type, id, path, published} = parsed;
 
         let payload, rated;
         try {
             switch (type) {
                 case 'scenario': {
-                    rated = await ctx.api.getScenario(id);
+                    rated = await ctx.api.getScenario(id, published);
                     payload = BodyBuilder.scenarioDetailsPayload(rated, time, path, id);
                     break;
                 }
