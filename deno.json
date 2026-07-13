@@ -3,8 +3,8 @@
     "@std/collections": "jsr:@std/collections@^1.3.0",
     "collections": "jsr:@std/collections",
     "log": "jsr:@std/log@^0.224.14",
-    "seyfert": "npm:seyfert@3.2.6",
-    "seyfert/": "npm:/seyfert@3.2.6/",
+    "seyfert": "npm:seyfert@5.0.0",
+    "seyfert/": "npm:/seyfert@5.0.0/",
     "nunjucks": "npm:nunjucks@^3.2.4",
     "encoding": "jsr:@std/encoding"
   },

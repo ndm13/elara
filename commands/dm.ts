@@ -1,4 +1,4 @@
-import {Command, CommandContext, Declare} from 'npm:seyfert';
+import {Command, CommandContext, Declare} from 'seyfert';
 import {MessageFlags} from "seyfert/lib/types/index.js";
 
 @Declare({
@@ -8,7 +8,7 @@ import {MessageFlags} from "seyfert/lib/types/index.js";
     contexts: ['Guild', 'PrivateChannel', 'BotDM']
 })
 export default class DMCommand extends Command {
-    async run(ctx: CommandContext<any>) {
+    override async run(ctx: CommandContext<any>) {
         const channel = await ctx.interaction.user.dm();
         if (ctx.interaction.channel.id === channel.id) {
             return ctx.write({

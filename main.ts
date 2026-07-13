@@ -9,11 +9,13 @@ const api = await AIDungeonAPI.guest();
 const context = extendContext((_interaction) => ({ api }));
 
 declare module 'seyfert' {
-    interface UsingClient extends ParseClient<Client<true>> { } // Gateway
-    interface ExtendContext extends ReturnType<typeof context> {}
-    interface RegisteredMiddlewares {
-        logger: void;
+    interface SeyfertRegistry {
+        client: ParseClient<Client<true>>;
+        middlewares: {
+            logger: any;
+        };
     }
+    interface ExtendContext extends ReturnType<typeof context> {}
 }
 
 const client = new Client({ context, globalMiddlewares: ["logger"] });

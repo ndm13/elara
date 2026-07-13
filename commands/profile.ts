@@ -2,8 +2,9 @@ import {
     Command,
     Declare,
     Options,
-    createStringOption
-} from 'npm:seyfert';
+    createStringOption,
+    CommandContext
+} from 'seyfert';
 import {MessageFlags} from 'seyfert/lib/types/index.js';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
@@ -26,7 +27,7 @@ const options = {
 @Options(options)
 export default class ProfileCommand extends Command {
 
-    async run(ctx: CommandContext<typeof options>) {
+    override async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
 
         try {

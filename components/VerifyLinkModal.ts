@@ -6,15 +6,15 @@ import BodyBuilder from "../common/BodyBuilder.ts";
 import {parseDungeonUrl} from "../common/dungeonUrl.ts";
 
 export default class VerifyLinkModal extends ModalCommand {
-    filter(ctx: ModalContext) {
+    override filter(ctx: ModalContext) {
         return ctx.customId === 'verify_link_modal';
     }
 
-    async run(ctx: ModalContext) {
-        const link = ctx.interaction.components.find(c => c.type === 1).components[0].value;
+    override async run(ctx: ModalContext) {
+        const link = ctx.getInputValue('link', true) as string;
         const parsed = parseDungeonUrl(link);
 
-        if (!parsed || parsed.type !== 'adventure' || !parsed.hostname.endsWith('.aidungeon.com'))
+        if (!parsed || parsed.type !== 'adventure' || parsed.hostname !== 'play.aidungeon.com')
             return await ctx.write({
                 content: "Wait, that doesn't look like a valid AI Dungeon adventure link to me! Please copy the link from AI Dungeon.",
                 flags: MessageFlags.Ephemeral

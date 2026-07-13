@@ -21,7 +21,7 @@ export default class AdventureStateButton extends ComponentCommand {
             const data = await ctx.api.getAdvancedAdventure(id);
             const short: InteractionCreateBodyRequest = {
                 flags: (ctx.interaction.message.flags || 0) & ~MessageFlags.IsComponentsV2
-            }, long: InteractionCreateBodyRequest = {...short};
+            }, long: any = {...short};
 
             switch (type) {
                 case 'scgen': {

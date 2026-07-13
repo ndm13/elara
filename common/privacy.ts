@@ -10,8 +10,8 @@ export const privacy = createStringOption({
     ]
 });
 
-export async function sendWithPrivacy(ctx: CommandContext<typeof privacy>, payload) {
-    switch (ctx.options.privacy || 'public') {
+export async function sendWithPrivacy(ctx: CommandContext<any>, payload: any) {
+    switch ((ctx.options as any).privacy || 'public') {
         case 'private': {
             return await ctx.write({
                 ...payload,

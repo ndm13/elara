@@ -1,5 +1,5 @@
-import {Command, CommandContext, createStringOption, Declare, Options} from 'npm:seyfert';
-import {ApplicationCommandType} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {Command, CommandContext, createStringOption, Declare, Options} from 'seyfert';
+import {ApplicationCommandType} from "seyfert/lib/types/index.js";
 
 const greetings = [
     "👋 Hi!",
@@ -37,7 +37,7 @@ const options = {
 })
 @Options(options)
 export default class HiCommand extends Command {
-    async run(ctx: CommandContext<typeof options>) {
+    override async run(ctx: CommandContext<typeof options>) {
         switch (ctx.options.topic) {
             case "who":
                 return ctx.write({
