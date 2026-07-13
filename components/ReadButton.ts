@@ -1,13 +1,16 @@
-import {AttachmentBuilder, ComponentCommand, type ComponentContext} from 'npm:seyfert';
-import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {AttachmentBuilder, ComponentCommand} from 'seyfert';
+import type { ComponentContext } from 'seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import {Buffer} from 'node:buffer';
-import {Environment, FileSystemLoader, runtime, lib} from "npm:nunjucks@^3.2.4";
+import {Environment, Template, runtime, lib} from "nunjucks";
 import {MultiplayerEntry, ReadAdventureData} from "../common/AIDungeonAPI.ts";
 import {slug} from "../common/slug.ts";
+import {customIdRouter} from "../common/customId.ts";
+import readHtmlTemplate from "../templates/read.njk" with {type: 'text'};
 
 const listFormatter = new Intl.ListFormat();
 
-const env = new Environment(new FileSystemLoader('./src/templates'));
+const env = new Environment();
 env.addFilter('p', function(text: string) {
     return runtime.markSafe(
         lib.escape(text).replaceAll(/\n/gm,'\n    <br>\n    ')
@@ -22,7 +25,7 @@ env.addFilter('player', function(id: string, allPlayers: MultiplayerEntry[]) {
     return allPlayers.find(player => player.user.id === id);
 });
 
-const readHtml = env.getTemplate('read.njk');
+const readHtml = new Template(readHtmlTemplate, env);
 
 export default class ReadButton extends ComponentCommand {
     componentType = 'Button' as const;
@@ -34,7 +37,9 @@ export default class ReadButton extends ComponentCommand {
     async run(ctx: ComponentContext<typeof this.componentType>) {
         await ctx.deferReply();
 
-        const {type, actions, id} = /^read_(?<type>[^_]+)_(?<actions>[^_]+)_(?<id>.*)$/.exec(ctx.customId).groups;
+        const parsed = customIdRouter.read.parse(ctx.customId);
+        if (!parsed) return;
+        const {type, actions, id} = parsed;
 
         try {
             const data = await ctx.api.getReadAdventure(id, Number.parseInt(actions) + 10) as ReadAdventureData;

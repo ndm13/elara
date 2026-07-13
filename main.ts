@@ -1,5 +1,9 @@
 import {AIDungeonAPI} from "./common/AIDungeonAPI.ts";
-import { Client, extendContext, createMiddleware } from "seyfert";
+import { Client, extendContext, createMiddleware, type ParseClient } from "seyfert";
+
+import { commands } from "./commands/index.ts";
+import { components } from "./components/index.ts";
+import { events } from "./events/index.ts";
 
 const api = await AIDungeonAPI.guest();
 const context = extendContext((_interaction) => ({ api }));
@@ -7,6 +11,9 @@ const context = extendContext((_interaction) => ({ api }));
 declare module 'seyfert' {
     interface UsingClient extends ParseClient<Client<true>> { } // Gateway
     interface ExtendContext extends ReturnType<typeof context> {}
+    interface RegisteredMiddlewares {
+        logger: void;
+    }
 }
 
 const client = new Client({ context, globalMiddlewares: ["logger"] });
@@ -20,7 +27,7 @@ client.setServices({
                 if (middle.context.isComponent())
                     middle.context.client.logger.info(`@${middle.context.author.username}: [${middle.context.customId}]`);
                 if (middle.context.isMenu())
-                    middle.context.client.logger.info(`@${middle.context.author.username}: <${middle.context.customId}>`);
+                    middle.context.client.logger.info(`@${middle.context.author.username}: <${middle.context.interaction.data.name}>`);
                 if (middle.context.isModal())
                     middle.context.client.logger.info(`@${middle.context.author.username}: (${middle.context.customId})`);
                 middle.next();
@@ -28,6 +35,11 @@ client.setServices({
         )
     }
 })
+
+// Programmatically register commands, components, and events to support self-contained compilation
+client.commands.set(commands as any);
+client.components.set(components as any);
+client.events.set(events as any);
 
 client
     .start()

@@ -1,7 +1,9 @@
-import {ModalCommand, ModalContext} from 'npm:seyfert';
+import {ModalCommand} from 'seyfert';
+import type { ModalContext } from 'seyfert';
 import {MessageFlags} from "seyfert/lib/types/index.js";
 import {verifyToken} from "../common/verification.ts";
 import BodyBuilder from "../common/BodyBuilder.ts";
+import {parseDungeonUrl} from "../common/dungeonUrl.ts";
 
 export default class VerifyLinkModal extends ModalCommand {
     filter(ctx: ModalContext) {
@@ -10,22 +12,15 @@ export default class VerifyLinkModal extends ModalCommand {
 
     async run(ctx: ModalContext) {
         const link = ctx.interaction.components.find(c => c.type === 1).components[0].value;
-        const url = new URL(link);
+        const parsed = parseDungeonUrl(link);
 
-        if (url.hostname !== 'play.aidungeon.com')
+        if (!parsed || parsed.type !== 'adventure' || parsed.hostname !== 'play.aidungeon.com')
             return await ctx.write({
-                content: "Wait, you didn't copy this from AI Dungeon like I told you to! I can't use this, sorry.",
+                content: "Wait, that doesn't look like a valid AI Dungeon adventure link to me! Please copy the link from AI Dungeon.",
                 flags: MessageFlags.Ephemeral
             });
 
-        const matches = /\/(adventure\/(?<id>[\w-]+)\/.+)/.exec(url.pathname);
-        if (!matches)
-            return await ctx.write({
-                content: "Hmm, that doesn't look like an adventure link to me...",
-                flags: MessageFlags.Ephemeral
-            });
-
-        const id = matches.groups.id;
+        const { id } = parsed;
 
         try {
             const state = await ctx.api.getVerifyAdventureState(id);

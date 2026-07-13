@@ -1,7 +1,9 @@
-import {ComponentCommand, type ComponentContext} from 'npm:seyfert';
-import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {ComponentCommand} from 'seyfert';
+import type { ComponentContext } from 'seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
+import {customIdRouter} from "../common/customId.ts";
 
 export default class AdvancedButton extends ComponentCommand {
     componentType = 'Button' as const;
@@ -12,7 +14,9 @@ export default class AdvancedButton extends ComponentCommand {
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
         const time = new Stopwatch();
-        const {type, id} = /^advanced_(?<type>[^_]+)_(?<id>.*)$/.exec(ctx.customId).groups;
+        const parsed = customIdRouter.advanced.parse(ctx.customId);
+        if (!parsed) return;
+        const {type, id} = parsed;
 
         try {
             switch (type) {

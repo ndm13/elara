@@ -1,9 +1,11 @@
-import {Command, CommandContext, createStringOption, Declare, Options} from 'npm:seyfert';
+import {Command, createStringOption, Declare, Options} from 'seyfert';
+import type { CommandContext } from 'seyfert';
 import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 import {MessageFlags} from 'seyfert/lib/types/index.js';
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
 import {nsfwCheck} from "../common/nsfwCheck.ts";
+import {parseDungeonUrl} from "../common/dungeonUrl.ts";
 
 const options = {
     link: createStringOption({
@@ -24,18 +26,16 @@ export default class PeekCommand extends Command {
 
     async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
-        const url = new URL(ctx.options.link);
-        const matches = /\/(((?<type>scenario|adventure)\/(?<id>[\w-]+)\/.+)|((?<type>profile)\/(?<id>[\w-]+)))/.exec(url.pathname);
+        const parsed = parseDungeonUrl(ctx.options.link);
 
-        if (!matches) {
+        if (!parsed) {
             return await ctx.write({
                 content: "Wait... is that a *real* AI Dungeon link? To a scenario, adventure, or profile? I couldn't read it 😖",
                 flags: MessageFlags.Ephemeral
             });
         }
 
-        const {type, id} = matches.groups;
-        const path = url.pathname + url.search;
+        const {type, id, path} = parsed;
 
         let payload, rated;
         try {

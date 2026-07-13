@@ -1,26 +1,28 @@
-import { ComponentCommand, type ComponentContext } from 'seyfert';
-
+import { ComponentCommand } from 'seyfert';
+import type { ComponentContext } from 'seyfert';
 import { MessageFlags } from 'seyfert/lib/types/index.js';
 import Stopwatch from "../common/Stopwatch.ts";
 import BodyBuilder from "../common/BodyBuilder.ts";
-import {slug} from "../common/slug.ts";
+import {customIdRouter} from "../common/customId.ts";
 
 export default class OpenProfileButton extends ComponentCommand {
     componentType = 'Button' as const;
 
     filter(ctx: ComponentContext<typeof this.componentType>) {
-        return ctx.customId.startsWith('open_scenario_');
+        return ctx.customId.startsWith('open_profile_');
     }
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
         const time = new Stopwatch();
-        const id = ctx.customId.slice(14);
+        const parsed = customIdRouter.openProfile.parse(ctx.customId);
+        if (!parsed) return;
+        const {id} = parsed;
 
         try {
-            const scenario = await ctx.api.getScenario(id);
+            const profile = await ctx.api.getUser(id);
             return await ctx.write({
-                flags: ctx.interaction.message.flags & ~MessageFlags.IsComponentsV2,
-                ...BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${id}/${slug(scenario.title)}`)
+                flags: ctx.interaction.message.flags,
+                ...BodyBuilder.profileDetailsPayload(profile, time, `/profile/${id}`)
             });
         } catch (e) {
             console.error(e);

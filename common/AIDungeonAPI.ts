@@ -139,7 +139,7 @@ export class AIDungeonAPI {
         return AIDungeonAPI.validateResponse(query, await this.query<ReadAdventureData>(query), shortId, 'adventure')
     }
 
-    async getScenario(shortId: string): ScenarioData {
+    async getScenario(shortId: string): Promise<ScenarioData> {
         const query = {
             operationName: "GetScenario",
             variables: {"shortId": shortId},
@@ -148,7 +148,7 @@ export class AIDungeonAPI {
         return AIDungeonAPI.validateResponse(query, await this.query<ScenarioData>(query), shortId, 'scenario');
     }
 
-    async getAdventure(shortId: string): AdventureData {
+    async getAdventure(shortId: string): Promise<AdventureData> {
         const query = {
             operationName: "GetAdventure",
             variables: {"shortId": shortId},
@@ -157,7 +157,7 @@ export class AIDungeonAPI {
         return AIDungeonAPI.validateResponse(query, await this.query<AdventureData>(query), shortId, 'adventure');
     }
 
-    async getUser(username: string): UserData {
+    async getUser(username: string): Promise<UserData> {
         const query = {
             operationName: "ProfileScreenGetUser",
             variables: {"username": username},

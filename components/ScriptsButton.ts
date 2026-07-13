@@ -1,6 +1,8 @@
-import {AttachmentBuilder, ComponentCommand, type ComponentContext} from 'npm:seyfert';
-import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {AttachmentBuilder, ComponentCommand} from 'seyfert';
+import type { ComponentContext } from 'seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import {Buffer} from 'node:buffer';
+import {customIdRouter} from "../common/customId.ts";
 
 export default class ScriptsButton extends ComponentCommand {
     componentType = 'Button' as const;
@@ -10,7 +12,9 @@ export default class ScriptsButton extends ComponentCommand {
     }
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
-        const id = ctx.customId.slice(8);
+        const parsed = customIdRouter.scripts.parse(ctx.customId);
+        if (!parsed) return;
+        const {id} = parsed;
 
         try {
             const scripts = await ctx.api.getAdvancedScenario(id);

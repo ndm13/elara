@@ -1,41 +1,38 @@
-import {
-    Command,
-    Declare,
-    Options,
-    createStringOption,
-    ExtendContext
-} from 'npm:seyfert';
+import {Command, createStringOption, Declare, Options} from 'seyfert';
+import type { CommandContext } from 'seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import BodyBuilder from "../common/BodyBuilder.ts";
 import Stopwatch from "../common/Stopwatch.ts";
 import {privacy, sendWithPrivacy} from "../common/privacy.ts";
 import {nsfwCheck} from "../common/nsfwCheck.ts";
+import {slug} from "../common/slug.ts";
 
 const options = {
     id: createStringOption({
-        description: "The ID of the adventure",
+        description: "The ID of the scenario",
         required: true,
     }),
     privacy
 };
 
 @Declare({
-    name: 'adventure',
-    description: 'Look up an AI Dungeon adventure',
+    name: 'scenario',
+    description: 'Look up an AI Dungeon scenario',
     integrationTypes: ['GuildInstall', 'UserInstall'],
     contexts: ['Guild', 'PrivateChannel', 'BotDM']
 })
 @Options(options)
-export default class AdventureCommand extends Command {
+export default class ScenarioCommand extends Command {
 
-    async run(ctx: ExtendContext<typeof options>) {
+    async run(ctx: CommandContext<typeof options>) {
         const time = new Stopwatch();
 
         try {
-            const adventure = await ctx.api.getAdventure(ctx.options.id);
-            let payload = BodyBuilder.adventureDetailsPayload(adventure, time, `/adventure/${ctx.options.id}/${adventure.title.toLowerCase().replaceAll(/\W+/g, '-')}`, ctx.options.id);
-            if (nsfwCheck(ctx, adventure)) {
+            const scenario = await ctx.api.getScenario(ctx.options.id);
+            const payload = BodyBuilder.scenarioDetailsPayload(scenario, time, `/scenario/${ctx.options.id}/${slug(scenario.title)}`, ctx.options.id);
+            if (nsfwCheck(ctx, scenario)) {
                 return await ctx.write({
-                    content: `This adventure is ${adventure.contentRating !== 'Unrated' ? 'rated ' : ''}${adventure.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
+                    content: `This scenario is ${scenario.contentRating !== 'Unrated' ? 'rated ' : ''}${scenario.contentRating}, and I can't post that in a non-NSFW channel. I'll just show it to you!`,
                     ...payload,
                     flags: MessageFlags.Ephemeral
                 });

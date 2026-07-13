@@ -1,7 +1,9 @@
-import {AttachmentBuilder, ComponentCommand, type ComponentContext} from 'npm:seyfert';
-import {MessageFlags} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {AttachmentBuilder, ComponentCommand} from 'seyfert';
+import type { ComponentContext } from 'seyfert';
+import {MessageFlags} from "seyfert/lib/types/index.js";
 import {Buffer} from 'node:buffer';
-import {InteractionCreateBodyRequest} from "npm:seyfert@3.2.6/lib/common";
+import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
+import {customIdRouter} from "../common/customId.ts";
 
 export default class ScenarioStateButton extends ComponentCommand {
     componentType = 'Button' as const;
@@ -11,7 +13,9 @@ export default class ScenarioStateButton extends ComponentCommand {
     }
 
     async run(ctx: ComponentContext<typeof this.componentType>) {
-        const {type, id} = /^scenario_state_(?<type>[^_]+)_(?<id>.*)$/.exec(ctx.customId).groups;
+        const parsed = customIdRouter.scenarioState.parse(ctx.customId);
+        if (!parsed) return;
+        const {type, id} = parsed;
 
         try {
             const data = await ctx.api.getAdvancedScenario(id);

@@ -1,5 +1,6 @@
-import {ActionRow, Command, CommandContext, Declare, Modal, TextDisplay, TextInput} from 'npm:seyfert';
-import {TextInputStyle} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {ActionRow, Command, Declare, Modal, TextDisplay, TextInput} from 'seyfert';
+import type { CommandContext } from 'seyfert';
+import {TextInputStyle} from "seyfert/lib/types/index.js";
 import {generateToken} from "../common/verification.ts";
 
 @Declare({
@@ -9,7 +10,7 @@ import {generateToken} from "../common/verification.ts";
     contexts: ['Guild', 'PrivateChannel', 'BotDM']
 })
 export default class VerifyCommand extends Command {
-    async run(ctx: CommandContext<typeof options>) {
+    async run(ctx: CommandContext) {
         const token = await generateToken(ctx.interaction.user.id);
 
         const modal = new Modal()

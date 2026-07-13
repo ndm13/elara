@@ -1,9 +1,10 @@
 import {AdvancedAdventureData, AdvancedScenarioData, AdventureData, ScenarioData, UserData} from "./AIDungeonAPI.ts";
-import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Thumbnail, User} from "npm:seyfert@3.2.6";
+import {ActionRow, Button, Container, Embed, Section, Separator, TextDisplay, Thumbnail, User} from "seyfert";
 import {InteractionCreateBodyRequest} from "seyfert/lib/common/index.js";
 import Stopwatch from "./Stopwatch.ts";
-import {MessageFlags, ButtonStyle} from "npm:seyfert@3.2.6/lib/types/index.js";
+import {MessageFlags, ButtonStyle} from "seyfert/lib/types/index.js";
 import { chunk } from "jsr:@std/collections";
+import { customIdRouter } from "./customId.ts";
 
 function getCover(image: string) {
     const url = new URL(image);
@@ -108,11 +109,11 @@ export default {
                         new Button()
                             .setLabel(`${scenario.user.profile.title}'s Profile`)
                             .setStyle(ButtonStyle.Primary)
-                            .setCustomId('open_profile_' + scenario.user.profile.title),
+                            .setCustomId(customIdRouter.openProfile.build(scenario.user.profile.title)),
                         new Button()
                             .setLabel(`More...`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('advanced_scenario_' + id)
+                            .setCustomId(customIdRouter.advanced.build('scenario', id))
                     ])
             ]
         };
@@ -197,11 +198,11 @@ export default {
                         new Button()
                             .setLabel(`${adventure.user.profile.title}'s Profile`)
                             .setStyle(ButtonStyle.Primary)
-                            .setCustomId('open_profile_' + adventure.user.profile.title),
+                            .setCustomId(customIdRouter.openProfile.build(adventure.user.profile.title)),
                         new Button()
                             .setLabel(`More...`)
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('advanced_adventure_' + id)
+                            .setCustomId(customIdRouter.advanced.build('adventure', id))
                     ])
             ]
         };
@@ -316,7 +317,7 @@ export default {
                             .setContent(`This scenario has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's'}.`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`story_cards_scenario_${id}`)
+                        .setCustomId(customIdRouter.storyCards.build('scenario', id))
                         .setLabel('Get Story Cards')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(data.storyCardCount === 0)),
@@ -328,7 +329,7 @@ export default {
                             .setContent(`This scenario ${hasScripts ? 'has' : '**does not** have'} scripts.${scriptList}`),)
                     .setAccessory(
                         new Button()
-                            .setCustomId(`scripts_${id}`)
+                            .setCustomId(customIdRouter.scripts.build(id))
                             .setLabel("Get Scripts")
                             .setStyle(ButtonStyle.Secondary)
                             .setDisabled(!hasScripts)),
@@ -340,7 +341,7 @@ export default {
                             .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This scenario **does not use** plot essentials.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`scenario_state_memory_${id}`)
+                        .setCustomId(customIdRouter.scenarioState.build('memory', id))
                         .setLabel('Show Plot Essentials')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.memory)),
@@ -350,7 +351,7 @@ export default {
                             .setContent(data.authorsNote ? `The author's note is ${textBlockMetadata(data.authorsNote)}` : "This scenario **does not have** an author's note.")
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`scenario_state_authors-note_${id}`)
+                        .setCustomId(customIdRouter.scenarioState.build('authors-note', id))
                         .setLabel("Show Author's Note")
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.authorsNote)),
@@ -360,7 +361,7 @@ export default {
                             .setContent(`This scenario ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`scenario_state_scgen_${id}`)
+                        .setCustomId(customIdRouter.scenarioState.build('scgen', id))
                         .setLabel('Show Generator Details')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(scgenEnhancements.length === 0)),
@@ -372,7 +373,7 @@ export default {
                                 'This scenario **does not have** custom instructions.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`scenario_state_instructions_${id}`)
+                        .setCustomId(customIdRouter.scenarioState.build('instructions', id))
                         .setLabel('Show Custom Instructions')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(data.state.instructions?.type !== 'scenario')),
@@ -382,7 +383,7 @@ export default {
                             .setContent(`The opening prompt is ${textBlockMetadata(data.prompt)}`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`scenario_state_prompt_${id}`)
+                        .setCustomId(customIdRouter.scenarioState.build('prompt', id))
                         .setLabel('Show Opening Prompt')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.prompt))
@@ -400,7 +401,7 @@ export default {
                 .filter(option => option.parentScenario?.shortId === id)
                 .filter(option => option.deletedAt === null)
                 .map(option => new Button()
-                    .setCustomId(`advanced_scenario_${option.shortId}`)
+                    .setCustomId(customIdRouter.advanced.build('scenario', option.shortId))
                     .setLabel(option.title)
                     .setStyle(ButtonStyle.Primary)), 5);
             for (const row of rows) {
@@ -434,7 +435,7 @@ export default {
                             .setContent(`*This adventure was created from the scenario* **${data.scenario.title}**.`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`open_scenario_${data.scenario.shortId}`)
+                        .setCustomId(customIdRouter.openScenario.build(data.scenario.shortId))
                         .setLabel('Open Scenario')
                         .setStyle(ButtonStyle.Primary)),
                 new Separator()
@@ -449,7 +450,7 @@ export default {
                         .setContent(`This adventure has **${data.storyCardCount}** story card${data.storyCardCount === 1 ? '' : 's'}.`)
                 )
                 .setAccessory(new Button()
-                    .setCustomId(`story_cards_adventure_${id}`)
+                    .setCustomId(customIdRouter.storyCards.build('adventure', id))
                     .setLabel('Get Story Cards')
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(data.storyCardCount === 0)),
@@ -461,7 +462,7 @@ export default {
                         .setContent(data.memory ? `The plot essentials are ${textBlockMetadata(data.memory)}` : 'This adventure **does not use** plot essentials.')
                 )
                 .setAccessory(new Button()
-                    .setCustomId(`adventure_state_memory_${id}`)
+                    .setCustomId(customIdRouter.adventureState.build('memory', id))
                     .setLabel('Show Plot Essentials')
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(!data.memory)),
@@ -471,7 +472,7 @@ export default {
                         .setContent(data.authorsNote ? `The author's note is ${textBlockMetadata(data.authorsNote)}` : "This adventure **does not have** an author's note.")
                 )
                 .setAccessory(new Button()
-                    .setCustomId(`adventure_state_authors-note_${id}`)
+                    .setCustomId(customIdRouter.adventureState.build('authors-note', id))
                     .setLabel("Show Author's Note")
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(!data.authorsNote))
@@ -484,11 +485,11 @@ export default {
             let scgenList = "";
             if (data.details.storyCardInstructions) {
                 scgenEnhancements.push('custom instructions');
-                scgenList += `\n- The story card instructions are ${textBlockMetadata(data.state.storyCardInstructions)}`;
+                scgenList += `\n- The story card instructions are ${textBlockMetadata(data.details.storyCardInstructions)}`;
             }
             if (data.details.storyCardStoryInformation) {
                 scgenEnhancements.push('custom information');
-                scgenList += `\n- The story information is ${textBlockMetadata(data.state.storyCardStoryInformation)}`;
+                scgenList += `\n- The story information is ${textBlockMetadata(data.details.storyCardStoryInformation)}`;
             }
 
             container.addComponents(
@@ -498,7 +499,7 @@ export default {
                             .setContent(`This adventure ${scgenEnhancements.length > 0 ? `uses **${scgenEnhancements.join(' and ')}** for story card generation` : '**does not use** story card generator enhancements'}.${scgenList}`)
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`adventure_state_scgen_${id}`)
+                        .setCustomId(customIdRouter.adventureState.build('scgen', id))
                         .setLabel('Show Generator Details')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(scgenEnhancements.length === 0)),
@@ -510,7 +511,7 @@ export default {
                                 'This adventure **does not have** custom instructions.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`adventure_state_instructions_${id}`)
+                        .setCustomId(customIdRouter.adventureState.build('instructions', id))
                         .setLabel('Show Custom Instructions')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(data.details.instructions?.type !== 'custom')),
@@ -522,7 +523,7 @@ export default {
                                 'This adventure **does not use** story summary.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`adventure_state_summary_${id}`)
+                        .setCustomId(customIdRouter.adventureState.build('summary', id))
                         .setLabel('Show Story Summary')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.details.storySummary))
@@ -540,7 +541,7 @@ export default {
                             .setContent(data.gameState ? `The game state is ${gameCodeMetadata(JSON.stringify(data.gameState,undefined,2))}.` : 'This adventure **does not have** an active game state.')
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`adventure_state_game-state_${id}`)
+                        .setCustomId(customIdRouter.adventureState.build('game-state', id))
                         .setLabel('Show Game State')
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.gameState)),
@@ -550,7 +551,7 @@ export default {
                             .setContent(data.message ? `The active message is ${textBlockMetadata(data.message)}` : "This adventure **does not have** an active message.")
                     )
                     .setAccessory(new Button()
-                        .setCustomId(`adventure_state_message_${id}`)
+                        .setCustomId(customIdRouter.adventureState.build('message', id))
                         .setLabel("Show Message")
                         .setStyle(ButtonStyle.Secondary)
                         .setDisabled(!data.message))
@@ -563,17 +564,17 @@ export default {
                 .setContent(`### Download Adventure Text\nThis adventure contains ${data.actionCount} actions.`),
             new ActionRow().setComponents(
                 new Button()
-                    .setCustomId(`read_md_${data.actionCount}_${id}`)
+                    .setCustomId(customIdRouter.read.build('md', data.actionCount, id))
                     .setLabel('Markdown')
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(data.actionCount === 0),
                 new Button()
-                    .setCustomId(`read_plain_${data.actionCount}_${id}`)
+                    .setCustomId(customIdRouter.read.build('plain', data.actionCount, id))
                     .setLabel('Plain Text')
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(data.actionCount === 0),
                 new Button()
-                    .setCustomId(`read_html_${data.actionCount}_${id}`)
+                    .setCustomId(customIdRouter.read.build('html', data.actionCount, id))
                     .setLabel('HTML')
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(data.actionCount === 0)
