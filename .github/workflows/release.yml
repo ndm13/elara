@@ -1,0 +1,106 @@
+name: Build and Release
+
+on:
+  release:
+    types: [published]
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-binaries:
+    name: Build Standalone Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+          - x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Compile Binary
+        run: |
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            SUFFIX=".exe"
+          else
+            SUFFIX=""
+          fi
+          deno compile --no-check --unstable-raw-imports --allow-env --allow-net --allow-read=./ --allow-write=./commands.json --target ${{ matrix.target }} --output elara-${{ matrix.target }}$SUFFIX ./main.ts
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: elara-${{ matrix.target }}
+          path: elara-${{ matrix.target }}*
+          retention-days: 1
+
+  release-binaries:
+    name: Upload Binaries to Release
+    needs: build-binaries
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          pattern: elara-*
+          merge-multiple: true
+
+      - name: List downloaded files
+        run: ls -R ./artifacts
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "Uploading assets to release tag: ${{ github.event.release.tag_name }}"
+          gh release upload ${{ github.event.release.tag_name }} ./artifacts/elara-* --clobber
+
+  release-docker:
+    name: ${{ github.event_name == 'release' && 'Build & Push Docker Image' || 'Build Docker Image' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        if: github.event_name == 'release'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
