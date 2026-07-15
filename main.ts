@@ -4,6 +4,7 @@ import { Client, extendContext, createMiddleware, type ParseClient } from "seyfe
 import { commands } from "./commands/index.ts";
 import { components } from "./components/index.ts";
 import { events } from "./events/index.ts";
+import seyfertConfig from "./seyfert.config.mts";
 
 const api = await AIDungeonAPI.guest();
 const context = extendContext((_interaction) => ({ api }));
@@ -19,6 +20,10 @@ declare module 'seyfert' {
 }
 
 const client = new Client({ context, globalMiddlewares: ["logger"] });
+
+client.getRC = () => {
+    return Promise.resolve(seyfertConfig as any);
+};
 
 client.setServices({
     middlewares: {
