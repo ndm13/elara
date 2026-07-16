@@ -48,6 +48,12 @@ export default class ScenarioStateButton extends ComponentCommand {
                 }
                 case 'instructions': {
                     short.content = `Here are the custom AI instructions!\n\`\`\`md\n${data.state.instructions?.scenario}\n\`\`\``;
+                    long.content = `Here are the custom AI instru- wow, that's a lot of instructions!`;
+                    long.files = [new AttachmentBuilder()
+                        .setName(`scenario-${id}-ai-instructions.md`)
+                        .setDescription(`AI instructions for scenario ${id}`)
+                        .setFile('buffer', Buffer.from(data.state.instructions?.scenario, 'utf-8'))
+                        ];
                     break;
                 }
                 case 'memory': {
@@ -58,7 +64,7 @@ export default class ScenarioStateButton extends ComponentCommand {
                             .setName(`scenario-${id}-memory.md`)
                             .setDescription(`Plot essentials for scenario ${id}`)
                             .setFile('buffer', Buffer.from(data.memory, 'utf8'))
-                    ]
+                    ];
                     break;
                 }
                 case 'authors-note': {
@@ -69,7 +75,7 @@ export default class ScenarioStateButton extends ComponentCommand {
                             .setName(`scenario-${id}-authors-note.md`)
                             .setDescription(`Author's note for scenario ${id}`)
                             .setFile('buffer', Buffer.from(data.authorsNote, 'utf8'))
-                    ]
+                    ];
                     break;
                 }
                 case 'prompt': {
